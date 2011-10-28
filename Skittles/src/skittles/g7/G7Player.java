@@ -17,7 +17,7 @@ public class G7Player extends Player
 	private int intLastEatIndex;
 	private int intLastEatNum;
 
-	private Random random;
+	private Random random = new Random();
 
 	private int indexToHoard;
 	private int turnNumber;
@@ -34,11 +34,17 @@ public class G7Player extends Player
 	@Override
 	public void eat( int[] aintTempEat )
 	{
-		// Taste one of each for the first five turns
-		if(turnNumber < 5){
+		// Taste one of each for the first intColorNum turns
+		while (turnNumber < intColorNum) {
+			if (aintInHand[turnNumber] > 0) {
+				break;
+			}
+			++turnNumber;
+		}
+		if (turnNumber < intColorNum) {
 			intLastEatIndex = turnNumber;
 			intLastEatNum = 1;
-			aintTempEat[ intLastEatIndex ] = intLastEatNum;
+			aintTempEat[intLastEatIndex] = intLastEatNum;
 			isTasted[turnNumber] = true;
 			++turnNumber;
 			return;
