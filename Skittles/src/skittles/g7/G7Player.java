@@ -13,6 +13,8 @@ public class G7Player extends Player
 	private double[] adblTastes;
 	private int intLastEatIndex;
 	private int intLastEatNum;
+	private int indexToHorde;
+	private int turnNumber;
 	
 //	public DumpPlayer( int[] aintInHand )
 //	{
@@ -24,6 +26,11 @@ public class G7Player extends Player
 	@Override
 	public void eat( int[] aintTempEat )
 	{
+		if(turnNumber < 5){
+			intLastEatIndex = turnNumber;
+			intLastEatNum = 1;
+			
+		}
 		int intMaxColorIndex = -1;
 		int intMaxColorNum = 0;
 		for ( int intColorIndex = 0; intColorIndex < intColorNum; intColorIndex ++ )
@@ -144,7 +151,9 @@ public class G7Player extends Player
 		this.aintInHand = aintInHand;
 		intColorNum = aintInHand.length;
 		dblHappiness = 0;
+		indexToHorde = -1;
 		adblTastes = new double[ intColorNum ];
+		turnNumber = 0;
 		for ( int intColorIndex = 0; intColorIndex < intColorNum; intColorIndex ++ )
 		{
 			adblTastes[ intColorIndex ] = -1;
