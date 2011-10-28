@@ -1,6 +1,9 @@
 package skittles.g7;
 
-import skittles.sim.*;
+import java.util.Random;
+
+import skittles.sim.Offer;
+import skittles.sim.Player;
 
 public class G7Player extends Player 
 {
@@ -13,8 +16,13 @@ public class G7Player extends Player
 	private double[] adblTastes;
 	private int intLastEatIndex;
 	private int intLastEatNum;
-	private int indexToHorde;
+
+	private Random random = new Random();
+
+	private int indexToHoard;
 	private int turnNumber;
+	private boolean[] isTasted;
+
 	
 //	public DumpPlayer( int[] aintInHand )
 //	{
@@ -26,30 +34,78 @@ public class G7Player extends Player
 	@Override
 	public void eat( int[] aintTempEat )
 	{
-		if(turnNumber < 5){
+
+		// Taste one of each for the first five turns
+		while(turnNumber < intColorNum){
+			if(aintInHand[turnNumber] > 0){
+
+				break;
+			}
+			++turnNumber;
+		}
+
+		if(turnNumber < intColorNum){
 			intLastEatIndex = turnNumber;
 			intLastEatNum = 1;
-			
+			aintTempEat[intLastEatIndex] = intLastEatNum;
+			isTasted[turnNumber] = true;
+			aintInHand[turnNumber]--;
+			++turnNumber;
+			return;
 		}
-		int intMaxColorIndex = -1;
-		int intMaxColorNum = 0;
-		for ( int intColorIndex = 0; intColorIndex < intColorNum; intColorIndex ++ )
-		{
-			if ( aintInHand[ intColorIndex ] > intMaxColorNum )
-			{
-				intMaxColorNum = aintInHand[ intColorIndex ];
-				intMaxColorIndex = intColorIndex;
+		
+		// Now sort through the adblTaste array to find our happiest color and make that our color to hoard
+		double currentBest = -2.0;
+		for(int i = 0; i < intColorNum; ++i){
+			if(adblTastes[i] > currentBest){
+				indexToHoard = i;
+				currentBest = adblTastes[i];
 			}
 		}
-		aintTempEat[ intMaxColorIndex ] = intMaxColorNum;
-		aintInHand[ intMaxColorIndex ] = 0;
-		intLastEatIndex = intMaxColorIndex;
-		intLastEatNum = intMaxColorNum;
+		
+		// For the stupid iteration, pick a random skittle with happiness at least zero, thats not our hoarding color, and eat one of them
+		intLastEatIndex = -1;
+		intLastEatNum = -1;
+		
+		for(int i = 0; i < intColorNum; ++i){
+			if(i != indexToHoard && adblTastes[i] >= 0 && aintInHand[i] > 0){
+				intLastEatIndex = i;
+				intLastEatNum = 1;
+				break;
+			}
+		}
+		
+		// If we didnt find one to eat that gives us at least a happiness of zero, find the max of the rest
+		if(intLastEatIndex < 0){
+			currentBest = -2.0;
+			for(int i = 0; i < intColorNum; ++i){
+				if(i != indexToHoard && adblTastes[i] > currentBest && aintInHand[i] > 0){
+					intLastEatIndex = i;
+					intLastEatNum = 1;
+					currentBest = adblTastes[i];
+				}
+			}
+		}
+		
+		// If we still didnt find anything, then we're at the end of the game and should eat all of our hoard!
+		if(intLastEatIndex < 0){
+			intLastEatIndex = indexToHoard;
+			intLastEatNum = aintInHand[intLastEatIndex];
+		}
+		
+		aintTempEat[ intLastEatIndex ] = intLastEatNum;
+		aintInHand[ intLastEatIndex ] -= intLastEatNum;
+		
+		System.out.println("After eating, skittles: ");
+		for(int i=0; i < intColorNum; i++){
+			System.out.print(aintInHand[i]+" ");
+		}
 	}
 	
 	@Override
 	public void offer( Offer offTemp )
 	{
+<<<<<<< HEAD
 		int intMaxColorIndex = 0;
 		int intMaxColorNum = 0;
 		int intMinColorIndex = 0;
@@ -70,16 +126,60 @@ public class G7Player extends Player
 			{
 				intMinColorNum = aintInHand[ intColorIndex ];
 				intMinColorIndex = intColorIndex;
+=======
+		/**
+		 * 
+		 * Always ask for what you like the most and always offer what you hate the most
+		 * If you dont know your tastes make empty offer 
+		 * 
+		 */
+		
+		int numExchanged = random.nextInt(5);
+		int fav = -1;
+		int hate = -1;
+		double min = 1.0;
+		double max = -1.0;
+		for(int i=0; i<intColorNum; i++){
+			if(isTasted[i]){
+				if(adblTastes[i] < min){
+					min = adblTastes[i];
+					hate = i;
+				}
+				if(adblTastes[i] > max){
+					max = adblTastes[i];
+					fav =i;
+				}
+>>>>>>> 2062025092d7d0871e71888ea374a8ce8c1c45b0
 			}
 		}
-		int[] aintOffer = new int[ intColorNum ];
-		int[] aintDesire = new int[ intColorNum ];
-		if ( intMinColorIndex != intMaxColorIndex )
-		{
-			aintOffer[ intMinColorIndex ] = intMinColorNum;
-			aintDesire[ intMaxColorIndex ] = intMinColorNum;
+		
+		int[] bid = new int[ intColorNum ];
+		int[] ask = new int[ intColorNum ];
+		
+		if(fav != -1 && hate != -1){
+			
+			while(aintInHand[hate] < numExchanged ) numExchanged--;
+			
+			bid[hate] = numExchanged;
+			ask[fav] = numExchanged;
 		}
-		offTemp.setOffer( aintOffer, aintDesire );
+		
+		System.out.println("In hand: ");
+		for(int i=0; i < intColorNum; i++){
+			System.out.print(aintInHand[i]+" ");
+		}
+		
+		System.out.print("\nBid: ");
+		for(int i=0; i < intColorNum; i++){
+			System.out.print(bid[i]+" ");
+		}
+		System.out.println();
+		System.out.print("Ask: ");
+		for(int i=0; i < intColorNum; i++){
+			System.out.print(ask[i]+" ");
+		}
+		System.out.println();
+		offTemp.setOffer( bid, ask );
 	}
 
 	@Override
@@ -161,11 +261,13 @@ public class G7Player extends Player
 		this.aintInHand = aintInHand;
 		intColorNum = aintInHand.length;
 		dblHappiness = 0;
-		indexToHorde = -1;
+		indexToHoard = -1;
 		adblTastes = new double[ intColorNum ];
 		turnNumber = 0;
+		isTasted = new boolean[intColorNum];
 		for ( int intColorIndex = 0; intColorIndex < intColorNum; intColorIndex ++ )
 		{
+			isTasted[intColorIndex] = false;
 			adblTastes[ intColorIndex ] = -1;
 		}
 	}
