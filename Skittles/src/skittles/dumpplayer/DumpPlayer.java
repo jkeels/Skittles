@@ -2,6 +2,8 @@ package skittles.dumpplayer;
 
 import skittles.sim.*;
 
+//test comment for git
+
 public class DumpPlayer extends Player 
 {
 	private int[] aintInHand;
