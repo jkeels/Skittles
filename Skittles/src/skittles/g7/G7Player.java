@@ -13,8 +13,9 @@ public class G7Player extends Player
 	private double[] adblTastes;
 	private int intLastEatIndex;
 	private int intLastEatNum;
-	private int indexToHorde;
+	private int indexToHoard;
 	private int turnNumber;
+	private boolean[] isTasted;
 	
 //	public DumpPlayer( int[] aintInHand )
 //	{
@@ -26,25 +27,57 @@ public class G7Player extends Player
 	@Override
 	public void eat( int[] aintTempEat )
 	{
+		// Taste one of each for the first five turns
 		if(turnNumber < 5){
 			intLastEatIndex = turnNumber;
 			intLastEatNum = 1;
-			
+			aintTempEat[ intLastEatIndex ] = intLastEatNum;
+			isTasted[turnNumber] = true;
+			++turnNumber;
+			return;
 		}
-		int intMaxColorIndex = -1;
-		int intMaxColorNum = 0;
-		for ( int intColorIndex = 0; intColorIndex < intColorNum; intColorIndex ++ )
-		{
-			if ( aintInHand[ intColorIndex ] > intMaxColorNum )
-			{
-				intMaxColorNum = aintInHand[ intColorIndex ];
-				intMaxColorIndex = intColorIndex;
+		
+		// Now sort through the adblTaste array to find our happiest color and make that our color to hoard
+		double currentBest = -2.0;
+		for(int i = 0; i < intColorNum; ++i){
+			if(adblTastes[i] > currentBest){
+				indexToHoard = i;
+				currentBest = adblTastes[i];
 			}
 		}
-		aintTempEat[ intMaxColorIndex ] = intMaxColorNum;
-		aintInHand[ intMaxColorIndex ] = 0;
-		intLastEatIndex = intMaxColorIndex;
-		intLastEatNum = intMaxColorNum;
+		
+		// For the stupid iteration, pick a random skittle with happiness at least zero, thats not our hoarding color, and eat one of them
+		intLastEatIndex = -1;
+		intLastEatNum = -1;
+		
+		for(int i = 0; i < intColorNum; ++i){
+			if(i != indexToHoard && adblTastes[i] >= 0 && aintInHand[i] > 0){
+				intLastEatIndex = i;
+				intLastEatNum = 1;
+				break;
+			}
+		}
+		
+		// If we didnt find one to eat that gives us at least a happiness of zero, find the max of the rest
+		if(intLastEatIndex < 0){
+			currentBest = -2.0;
+			for(int i = 0; i < intColorNum; ++i){
+				if(i != indexToHoard && adblTastes[i] > currentBest && aintInHand[i] > 0){
+					intLastEatIndex = i;
+					intLastEatNum = 1;
+					currentBest = adblTastes[i];
+				}
+			}
+		}
+		
+		// If we still didnt find anything, then we're at the end of the game and should eat all of our hoard!
+		if(intLastEatIndex < 0){
+			intLastEatIndex = indexToHoard;
+			intLastEatNum = aintInHand[intLastEatIndex];
+		}
+		
+		aintTempEat[ intLastEatIndex ] = intLastEatNum;
+		aintInHand[ intLastEatIndex ] -= intLastEatNum;
 	}
 	
 	@Override
@@ -151,11 +184,13 @@ public class G7Player extends Player
 		this.aintInHand = aintInHand;
 		intColorNum = aintInHand.length;
 		dblHappiness = 0;
-		indexToHorde = -1;
+		indexToHoard = -1;
 		adblTastes = new double[ intColorNum ];
 		turnNumber = 0;
+		isTasted = new boolean[intColorNum];
 		for ( int intColorIndex = 0; intColorIndex < intColorNum; intColorIndex ++ )
 		{
+			isTasted[intColorIndex] = false;
 			adblTastes[ intColorIndex ] = -1;
 		}
 	}
