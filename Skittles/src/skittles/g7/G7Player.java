@@ -105,7 +105,6 @@ public class G7Player extends Player
 	@Override
 	public void offer( Offer offTemp )
 	{
-<<<<<<< HEAD
 		int intMaxColorIndex = 0;
 		int intMaxColorNum = 0;
 		int intMinColorIndex = 0;
@@ -126,7 +125,6 @@ public class G7Player extends Player
 			{
 				intMinColorNum = aintInHand[ intColorIndex ];
 				intMinColorIndex = intColorIndex;
-=======
 		/**
 		 * 
 		 * Always ask for what you like the most and always offer what you hate the most
@@ -149,7 +147,6 @@ public class G7Player extends Player
 					max = adblTastes[i];
 					fav =i;
 				}
->>>>>>> 2062025092d7d0871e71888ea374a8ce8c1c45b0
 			}
 		}
 		
@@ -172,6 +169,13 @@ public class G7Player extends Player
 		System.out.print("\nBid: ");
 		for(int i=0; i < intColorNum; i++){
 			System.out.print(bid[i]+" ");
+		}
+		System.out.println();
+		System.out.print("Ask: ");
+		for(int i=0; i < intColorNum; i++){
+			System.out.print(ask[i]+" ");
+		}
+		System.out.println();
 		}
 		System.out.println();
 		System.out.print("Ask: ");
