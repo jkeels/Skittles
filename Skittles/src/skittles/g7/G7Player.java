@@ -1,6 +1,9 @@
 package skittles.g7;
 
-import skittles.sim.*;
+import java.util.Random;
+
+import skittles.sim.Offer;
+import skittles.sim.Player;
 
 public class G7Player extends Player 
 {
@@ -13,9 +16,13 @@ public class G7Player extends Player
 	private double[] adblTastes;
 	private int intLastEatIndex;
 	private int intLastEatNum;
+
+	private Random random;
+
 	private int indexToHoard;
 	private int turnNumber;
 	private boolean[] isTasted;
+
 	
 //	public DumpPlayer( int[] aintInHand )
 //	{
@@ -83,31 +90,40 @@ public class G7Player extends Player
 	@Override
 	public void offer( Offer offTemp )
 	{
-		int intMaxColorIndex = 0;
-		int intMaxColorNum = 0;
-		int intMinColorIndex = 0;
-		int intMinColorNum = Integer.MAX_VALUE;
-		for ( int intColorIndex = 0; intColorIndex < intColorNum; intColorIndex ++ )
-		{
-			if ( aintInHand[ intColorIndex ] > intMaxColorNum )
-			{
-				intMaxColorNum = aintInHand[ intColorIndex ];
-				intMaxColorIndex = intColorIndex;
-			}
-			if ( aintInHand[ intColorIndex ] > 0 && aintInHand[ intColorIndex ] < intMinColorNum )
-			{
-				intMinColorNum = aintInHand[ intColorIndex ];
-				intMinColorIndex = intColorIndex;
+		/**
+		 * 
+		 * Always ask for what you like the most and always offer what you hate the most
+		 * If you dont know your tastes make empty offer 
+		 * 
+		 */
+		
+		int numExchanged = random.nextInt(5);
+		int fav = -1;
+		int hate = -1;
+		double min = 1.0;
+		double max = -1.0;
+		for(int i=0; i<intColorNum; i++){
+			if(isTasted[i]){
+				if(adblTastes[i] < min){
+					min = adblTastes[i];
+					hate = i;
+				}
+				if(adblTastes[i] > max){
+					max = adblTastes[i];
+					fav =i;
+				}
 			}
 		}
-		int[] aintOffer = new int[ intColorNum ];
-		int[] aintDesire = new int[ intColorNum ];
-		if ( intMinColorIndex != intMaxColorIndex )
-		{
-			aintOffer[ intMinColorIndex ] = intMinColorNum;
-			aintDesire[ intMaxColorIndex ] = intMinColorNum;
+		
+		int[] bid = new int[ intColorNum ];
+		int[] ask = new int[ intColorNum ];
+		
+		if(fav != -1 && hate != -1){
+			bid[hate] = numExchanged;
+			ask[fav] = numExchanged;
 		}
-		offTemp.setOffer( aintOffer, aintDesire );
+		
+		offTemp.setOffer( bid, ask );
 	}
 
 	@Override
