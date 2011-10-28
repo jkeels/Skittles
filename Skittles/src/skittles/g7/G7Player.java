@@ -34,18 +34,22 @@ public class G7Player extends Player
 	@Override
 	public void eat( int[] aintTempEat )
 	{
-		// Taste one of each for the first intColorNum turns
-		while (turnNumber < intColorNum) {
-			if (aintInHand[turnNumber] > 0) {
+
+		// Taste one of each for the first five turns
+		while(turnNumber < intColorNum){
+			if(aintInHand[turnNumber] > 0){
+
 				break;
 			}
 			++turnNumber;
 		}
-		if (turnNumber < intColorNum) {
+
+		if(turnNumber < intColorNum){
 			intLastEatIndex = turnNumber;
 			intLastEatNum = 1;
 			aintTempEat[intLastEatIndex] = intLastEatNum;
 			isTasted[turnNumber] = true;
+			aintInHand[turnNumber]--;
 			++turnNumber;
 			return;
 		}
@@ -91,6 +95,11 @@ public class G7Player extends Player
 		
 		aintTempEat[ intLastEatIndex ] = intLastEatNum;
 		aintInHand[ intLastEatIndex ] -= intLastEatNum;
+		
+		System.out.println("After eating, skittles: ");
+		for(int i=0; i < intColorNum; i++){
+			System.out.print(aintInHand[i]+" ");
+		}
 	}
 	
 	@Override
@@ -125,10 +134,28 @@ public class G7Player extends Player
 		int[] ask = new int[ intColorNum ];
 		
 		if(fav != -1 && hate != -1){
+			
+			while(aintInHand[hate] < numExchanged ) numExchanged--;
+			
 			bid[hate] = numExchanged;
 			ask[fav] = numExchanged;
 		}
 		
+		System.out.println("In hand: ");
+		for(int i=0; i < intColorNum; i++){
+			System.out.print(aintInHand[i]+" ");
+		}
+		
+		System.out.print("\nBid: ");
+		for(int i=0; i < intColorNum; i++){
+			System.out.print(bid[i]+" ");
+		}
+		System.out.println();
+		System.out.print("Ask: ");
+		for(int i=0; i < intColorNum; i++){
+			System.out.print(ask[i]+" ");
+		}
+		System.out.println();
 		offTemp.setOffer( bid, ask );
 	}
 
