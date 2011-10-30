@@ -108,6 +108,26 @@ public class G7Player extends Player
 	@Override
 	public void offer( Offer offTemp )
 	{
+		int intMaxColorIndex = 0;
+		int intMaxColorNum = 0;
+		int intMinColorIndex = 0;
+		int intMinColorNum = Integer.MAX_VALUE;
+		
+		//print happiness logic
+		for(int i = 0; i < adblTastes.length; i++)
+			System.out.println("adblTastes["+i+"] = "+adblTastes[i]);
+		
+		for ( int intColorIndex = 0; intColorIndex < intColorNum; intColorIndex ++ )
+		{
+			if ( aintInHand[ intColorIndex ] > intMaxColorNum )
+			{
+				intMaxColorNum = aintInHand[ intColorIndex ];
+				intMaxColorIndex = intColorIndex;
+			}
+			if ( aintInHand[ intColorIndex ] > 0 && aintInHand[ intColorIndex ] < intMinColorNum )
+			{
+				intMinColorNum = aintInHand[ intColorIndex ];
+				intMinColorIndex = intColorIndex;
 		/**
 		 * 
 		 * Always ask for what you like the most and always offer what you hate the most
@@ -159,6 +179,13 @@ public class G7Player extends Player
 			System.out.print(ask[i]+" ");
 		}
 		System.out.println();
+		}
+		System.out.println();
+		System.out.print("Ask: ");
+		for(int i=0; i < intColorNum; i++){
+			System.out.print(ask[i]+" ");
+		}
+		System.out.println();
 		offTemp.setOffer( bid, ask );
 	}
 
@@ -197,16 +224,21 @@ public class G7Player extends Player
 			int[] aintDesire = offTemp.getDesire();
 			if ( checkEnoughInHand( aintDesire ) )
 			{
+				//make sure that we dont trade too many of our liked candies
 				offReturn = offTemp;
 				aintDesire = offReturn.getDesire();
 				int[] aintOffer = offReturn.getOffer();
 				for ( int intColorIndex = 0; intColorIndex < intColorNum; intColorIndex ++ )
 				{
 					aintInHand[ intColorIndex ] += aintOffer[ intColorIndex ] - aintDesire[ intColorIndex ];
+					System.out.println("aintinhand["+intColorIndex+"] = " + aintInHand[intColorIndex]);
 				}
 				break;
 			}
+			
+			System.out.println("Pick offer is: " + offTemp.toString());
 		}
+		
 
 		return offReturn;
 	}
