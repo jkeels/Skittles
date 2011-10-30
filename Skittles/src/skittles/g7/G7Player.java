@@ -63,25 +63,28 @@ public class G7Player extends Player
 			}
 		}
 		
-		// For the stupid iteration, pick a random skittle with happiness at least zero, thats not our hoarding color, and eat one of them
+		// For the stupid iteration
 		intLastEatIndex = -1;
 		intLastEatNum = -1;
 		
-		for(int i = 0; i < intColorNum; ++i){
-			if(i != indexToHoard && adblTastes[i] >= 0 && aintInHand[i] > 0){
-				intLastEatIndex = i;
-				intLastEatNum = 1;
-				break;
-			}
-		}
-		
-		// If we didnt find one to eat that gives us at least a happiness of zero, find the max of the rest
 		if(intLastEatIndex < 0){
 			currentBest = -2.0;
 			for(int i = 0; i < intColorNum; ++i){
-				if(i != indexToHoard && adblTastes[i] > currentBest && aintInHand[i] > 0){
+				if(i != indexToHoard && adblTastes[i] <= 0 && adblTastes[i] > currentBest && aintInHand[i] > 0){
 					intLastEatIndex = i;
 					intLastEatNum = 1;
+					currentBest = adblTastes[i];
+				}
+			}
+		}
+		
+		// 
+		if (intLastEatIndex < 0) {
+			currentBest = 2.0;
+			for (int i = 0; i < intColorNum; ++i) {
+				if (i != indexToHoard && adblTastes[i] < currentBest && aintInHand[i] > 0) {
+					intLastEatIndex = i;
+					intLastEatNum = aintInHand[i];
 					currentBest = adblTastes[i];
 				}
 			}
