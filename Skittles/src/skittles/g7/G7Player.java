@@ -67,8 +67,8 @@ public class G7Player extends Player {
 			}
 		}
 
-		// For the stupid iteration, pick a random skittle with happiness at
-		// least zero, thats not our hoarding color, and eat one of them
+		// For the stupid iteration, find the skittle that will lose us the least happiness and eat one of those
+		// This will give us some time to trade stuff
 		intLastEatIndex = -1;
 		intLastEatNum = -1;
 
@@ -81,8 +81,9 @@ public class G7Player extends Player {
 			}
 		}
 
-		// If we didnt find one to eat that gives us at least a happiness of
-		// zero, find the max of the rest
+		// Now that we're out of negative-score skittles, find the skittle that gives us the least positive happiness
+		// and eat all of that color.  This will still give us a little bit of trading time to get more of our higher value
+		// skittles
 
 		currentBest = 2.0;
 		if (intLastEatIndex < 0) {
@@ -95,13 +96,13 @@ public class G7Player extends Player {
 			}
 		}
 
-		// If we still didnt find anything, then we're at the end of the game
-		// and should eat all of our hoard!
+		// Now eat the hoard!
 		if (intLastEatIndex < 0) {
 			intLastEatIndex = indexToHoard;
 			intLastEatNum = aintInHand[intLastEatIndex];
 		}
-
+		
+		// Update the aintInHand array
 		aintTempEat[intLastEatIndex] = intLastEatNum;
 		aintInHand[intLastEatIndex] -= intLastEatNum;
 
