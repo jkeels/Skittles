@@ -197,24 +197,30 @@ public class G7Player extends Player {
 				continue;
 			int[] aintDesire = offTemp.getDesire();
 			int[] aintGive = offTemp.getOffer();
+			// Check to see if we have enough to even go through with this trade before we deliberate
 			if (checkEnoughInHand(aintDesire)) {
 				double receive = 0.0;
 				double giveUp = 0.0;
+				// If they want any of our hoarding color, decline.
 				if(indexToHoard < 0 || aintDesire[indexToHoard] > 0){
 					continue;
 				}
+				// If they're giving any of our hoarding color, accept.
 				if(indexToHoard >= 0 && aintGive[indexToHoard] > 0){
 					offReturn = offTemp;
 				}
+				// Else, add up how much we would receive, and how much we would give up
 				if (offReturn == null) {
 					for (int i = 0; i < intColorNum; ++i) {
 						receive += adblTastes[i]*(Math.pow(aintDesire[i], 2));
 						giveUp += adblTastes[i]*(Math.pow(aintGive[i], 2));
 					}
+					// If we get more than we give (yay greed!) then lets do this deal!
 					if(receive - giveUp > 0){
 						offReturn = offTemp;
 					}
 				}
+				// If we took the deal, lets update our hand and not look at any others
 				if (offReturn != null) {
 					for (int intColorIndex = 0; intColorIndex < intColorNum; intColorIndex++) {
 						aintInHand[intColorIndex] += aintGive[intColorIndex]
