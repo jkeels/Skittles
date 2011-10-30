@@ -32,6 +32,12 @@ public class G7Player extends Player {
 	@Override
 	public void eat(int[] aintTempEat) {
 
+		System.out.println("Before eating, skittles: ");
+		for (int i = 0; i < intColorNum; i++) {
+			System.out.print(aintInHand[i] + " ");
+		}
+		System.out.println();
+		
 		// Taste one of each for the first five turns
 		while (turnNumber < intColorNum) {
 			if (aintInHand[turnNumber] > 0) {
@@ -45,8 +51,8 @@ public class G7Player extends Player {
 			intLastEatIndex = turnNumber;
 			intLastEatNum = 1;
 			aintTempEat[intLastEatIndex] = intLastEatNum;
-			isTasted[turnNumber] = true;
-			aintInHand[turnNumber]--;
+			isTasted[intLastEatIndex] = true;
+			aintInHand[intLastEatIndex]--;
 			++turnNumber;
 			return;
 		}
@@ -66,23 +72,24 @@ public class G7Player extends Player {
 		intLastEatIndex = -1;
 		intLastEatNum = -1;
 
+		currentBest = -2.0;
 		for (int i = 0; i < intColorNum; ++i) {
-			if (i != indexToHoard && adblTastes[i] >= 0 && aintInHand[i] > 0) {
+			if (adblTastes[i] < 0 && adblTastes[i] > currentBest && aintInHand[i] > 0) {
 				intLastEatIndex = i;
 				intLastEatNum = 1;
-				break;
+				currentBest = adblTastes[i];
 			}
 		}
 
 		// If we didnt find one to eat that gives us at least a happiness of
 		// zero, find the max of the rest
+
+		currentBest = 2.0;
 		if (intLastEatIndex < 0) {
-			currentBest = -2.0;
 			for (int i = 0; i < intColorNum; ++i) {
-				if (i != indexToHoard && adblTastes[i] > currentBest
-						&& aintInHand[i] > 0) {
+				if (i != indexToHoard && aintInHand[i] > 0 && adblTastes[i] < currentBest) {
 					intLastEatIndex = i;
-					intLastEatNum = 1;
+					intLastEatNum = aintInHand[i];
 					currentBest = adblTastes[i];
 				}
 			}
@@ -188,18 +195,34 @@ public class G7Player extends Player {
 					|| offTemp.getOfferLive() == false)
 				continue;
 			int[] aintDesire = offTemp.getDesire();
+			int[] aintGive = offTemp.getOffer();
 			if (checkEnoughInHand(aintDesire)) {
-				offReturn = offTemp;
-				aintDesire = offReturn.getDesire();
-				int[] aintOffer = offReturn.getOffer();
-				for (int intColorIndex = 0; intColorIndex < intColorNum; intColorIndex++) {
-					aintInHand[intColorIndex] += aintOffer[intColorIndex]
-							- aintDesire[intColorIndex];
+				double receive = 0.0;
+				double giveUp = 0.0;
+				if(indexToHoard < 0 || aintDesire[indexToHoard] > 0){
+					continue;
 				}
-				break;
+				if(indexToHoard >= 0 && aintGive[indexToHoard] > 0){
+					offReturn = offTemp;
+				}
+				if (offReturn == null) {
+					for (int i = 0; i < intColorNum; ++i) {
+						receive += adblTastes[i]*(Math.pow(aintDesire[i], 2));
+						giveUp += adblTastes[i]*(Math.pow(aintGive[i], 2));
+					}
+					if(receive - giveUp > 0){
+						offReturn = offTemp;
+					}
+				}
+				if (offReturn != null) {
+					for (int intColorIndex = 0; intColorIndex < intColorNum; intColorIndex++) {
+						aintInHand[intColorIndex] += aintGive[intColorIndex]
+								- aintDesire[intColorIndex];
+					}
+					break;
+				}
 			}
 		}
-
 		return offReturn;
 	}
 
