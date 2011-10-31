@@ -191,46 +191,55 @@ public class G7Player extends Player {
 	@Override
 	public Offer pickOffer(Offer[] aoffCurrentOffers) {
 		Offer offReturn = null;
+		double highestPotentialScore = 0; //can change this in future phases
 		for (Offer offTemp : aoffCurrentOffers) {
 			if (offTemp.getOfferedByIndex() == intPlayerIndex
 					|| offTemp.getOfferLive() == false)
 				continue;
-			int[] aintDesire = offTemp.getDesire();
-			int[] aintGive = offTemp.getOffer();
+			int[] currentDesire = offTemp.getDesire();
+			//int[] currentOffer = offTemp.getOffer();
+			double currentPotentialScore = checkOffer(offTemp);
 			// Check to see if we have enough to even go through with this trade before we deliberate
-			if (checkEnoughInHand(aintDesire)) {
-				double receive = 0.0;
-				double giveUp = 0.0;
-				// If they want any of our hoarding color, decline.
-				if(indexToHoard < 0 || aintDesire[indexToHoard] > 0){
-					continue;
-				}
-				// If they're giving any of our hoarding color, accept.
-				if(indexToHoard >= 0 && aintGive[indexToHoard] > 0){
+			if (checkEnoughInHand(currentDesire)) {
+				//check if offer is worth accepting. right now if its greater than 0
+				if(currentPotentialScore > highestPotentialScore) {
+					//if here, than its the current best offer for us
 					offReturn = offTemp;
-				}
-				// Else, add up how much we would receive, and how much we would give up
-				if (offReturn == null) {
-					for (int i = 0; i < intColorNum; ++i) {
-						receive += adblTastes[i]*(Math.pow(aintDesire[i], 2));
-						giveUp += adblTastes[i]*(Math.pow(aintGive[i], 2));
-					}
-					// If we get more than we give (yay greed!) then lets do this deal!
-					if(receive - giveUp > 0){
-						offReturn = offTemp;
-					}
-				}
-				// If we took the deal, lets update our hand and not look at any others
-				if (offReturn != null) {
-					for (int intColorIndex = 0; intColorIndex < intColorNum; intColorIndex++) {
-						aintInHand[intColorIndex] += aintGive[intColorIndex]
-								- aintDesire[intColorIndex];
-					}
-					break;
+					highestPotentialScore = currentPotentialScore;
 				}
 			}
 		}
+			
+		if( highestPotentialScore > 0) {
+			int[] tempDesire = offReturn.getDesire();
+			tempDesire = offReturn.getDesire();
+			int[] tempOffer = offReturn.getOffer();
+			for ( int intColorIndex = 0; intColorIndex < intColorNum; intColorIndex ++ )
+			{
+				aintInHand[ intColorIndex ] += tempOffer[ intColorIndex ] - tempDesire[ intColorIndex ];
+			}
+		}
 		return offReturn;
+	}
+	
+	public double checkOffer(Offer offer) {
+		
+		double differenceInScore = 0;
+		int[] tempDesire = offer.getDesire();
+		int[] tempOffer = offer.getOffer();
+		for(int i = 0; i < aintInHand.length; i++) {
+			//if its a color we like, update  potential score
+			if(adblTastes[i] > 0) {
+				differenceInScore += Math.pow((tempOffer[i] + aintInHand[i]), 2) - (adblTastes[i] * Math.pow(aintInHand[i], 2));
+				differenceInScore -= (adblTastes[i] * Math.pow(aintInHand[i], 2)) - (adblTastes[i] * Math.pow((aintInHand[i]- tempDesire[i]), 2));
+			} else {
+				differenceInScore += (adblTastes[i] * tempOffer[i]);
+				differenceInScore -= (adblTastes[i] * tempDesire[i]); 
+			}
+			
+		}
+	
+		return differenceInScore;
 	}
 
 	@Override

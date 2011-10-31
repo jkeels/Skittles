@@ -11,12 +11,12 @@
 		<InHand>random</InHand>
 	</Player>
 	<Player>
-		<Class>skittles.g7.G7Player</Class>
+		<Class>skittles.dumpplayer.DumpPlayer</Class>
 		<Happiness>random,5</Happiness>
 		<InHand>random</InHand>
 	</Player>
 	<Player>
-		<Class>skittles.g7.G7Player</Class>
+		<Class>skittles.dumpplayer.DumpPlayer</Class>
 		<Happiness>random,5</Happiness>
 		<InHand>random</InHand>
 	</Player>
