@@ -1,5 +1,6 @@
 package skittles.g7;
 
+import java.util.ArrayList;
 import java.util.Random;
 
 import skittles.sim.Offer;
@@ -17,10 +18,63 @@ public class G7Player extends Player {
 	private int intLastEatNum;
 
 	private Random random = new Random();
-
+	
 	private int indexToHoard;
 	private int turnNumber;
 	private boolean[] isTasted;
+	
+	private marketKnowledge[] market;
+
+	private class marketKnowledge {
+		ArrayList<Integer> colorKnowledge = new ArrayList<Integer>();
+
+		public marketKnowledge() {
+			for (int i = 0; i < intColorNum; ++i) {
+				colorKnowledge.add(0);
+			}
+		}
+
+		public int getColorInfo(int index) {
+			return colorKnowledge.get(index);
+		}
+
+		public void addColorInfo(int index, int delta) {
+			colorKnowledge.set(index, colorKnowledge.get(index) + delta);
+		}
+
+		public void decay() {
+			ArrayList<Integer> tempArr = new ArrayList<Integer>();
+			for (int i = 0; i < colorKnowledge.size(); ++i) {
+				if (colorKnowledge.get(i) > 0) {
+					colorKnowledge.set(i, (int) (colorKnowledge.get(i) * 0.8));
+				}
+			}
+		}
+		
+		public int getMaxColorIndex(){
+			int max = -2;
+			int maxIndex = -1;
+			for(int i = 0; i < colorKnowledge.size(); ++i){
+				if(colorKnowledge.get(i) > max){
+					max = colorKnowledge.get(i);
+					maxIndex = i;
+				}
+			}
+			return maxIndex;
+		}
+		
+		public int getMinColorIndex(){
+			int min = 2;
+			int minIndex = -1;
+			for(int i = 0; i < colorKnowledge.size(); ++i){
+				if(colorKnowledge.get(i) < min){
+					min = colorKnowledge.get(i);
+					minIndex = i;
+				}
+			}
+			return minIndex;
+		} 
+	}
 
 	// public DumpPlayer( int[] aintInHand )
 	// {
@@ -258,7 +312,7 @@ public class G7Player extends Player {
 	}
 
 	@Override
-	public void initialize(int intPlayerIndex, String strClassName,
+	public void initialize(int PlayerNum, int intPlayerIndex, String strClassName,
 			int[] aintInHand) {
 		this.intPlayerIndex = intPlayerIndex;
 		this.strClassName = strClassName;

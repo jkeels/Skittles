@@ -2,8 +2,6 @@ package skittles.dumpplayer;
 
 import skittles.sim.*;
 
-//test comment for git
-
 public class DumpPlayer extends Player 
 {
 	private int[] aintInHand;
@@ -139,7 +137,7 @@ public class DumpPlayer extends Player
 	}
 
 	@Override
-	public void initialize(int intPlayerIndex, String strClassName,	int[] aintInHand) 
+	public void initialize(int intPlayerNum, int intPlayerIndex, String strClassName,	int[] aintInHand) 
 	{
 		this.intPlayerIndex = intPlayerIndex;
 		this.strClassName = strClassName;
