@@ -26,15 +26,15 @@ public class G7Player extends Player {
 	private marketKnowledge[] market;
 
 	private class marketKnowledge {
-		ArrayList<Integer> colorKnowledge = new ArrayList<Integer>();
+		ArrayList<Double> colorKnowledge = new ArrayList<Double>();
 
 		public marketKnowledge() {
 			for (int i = 0; i < intColorNum; ++i) {
-				colorKnowledge.add(0);
+				colorKnowledge.add(0.0);
 			}
 		}
 
-		public int getColorInfo(int index) {
+		public double getColorInfo(int index) {
 			return colorKnowledge.get(index);
 		}
 
@@ -46,13 +46,13 @@ public class G7Player extends Player {
 			ArrayList<Integer> tempArr = new ArrayList<Integer>();
 			for (int i = 0; i < colorKnowledge.size(); ++i) {
 				if (colorKnowledge.get(i) > 0) {
-					colorKnowledge.set(i, (int) (colorKnowledge.get(i) * 0.8));
+					colorKnowledge.set(i, colorKnowledge.get(i) * 0.8);
 				}
 			}
 		}
 		
 		public int getMaxColorIndex(){
-			int max = -2;
+			double max = -2.0;
 			int maxIndex = -1;
 			for(int i = 0; i < colorKnowledge.size(); ++i){
 				if(colorKnowledge.get(i) > max){
@@ -64,7 +64,7 @@ public class G7Player extends Player {
 		}
 		
 		public int getMinColorIndex(){
-			int min = 2;
+			double min = 2.0;
 			int minIndex = -1;
 			for(int i = 0; i < colorKnowledge.size(); ++i){
 				if(colorKnowledge.get(i) < min){
@@ -308,7 +308,25 @@ public class G7Player extends Player {
 
 	@Override
 	public void updateOfferExe(Offer[] aoffCurrentOffers) {
-		// dumpplayer doesn't care
+		for(marketKnowledge mk : market){
+			mk.decay();
+		}
+		for(Offer off : aoffCurrentOffers){
+			int giverIndex = off.getOfferedByIndex();
+			int[] givingUp = off.getOffer();
+			int[] wants = off.getDesire();
+			
+			for(int i = 0; i < intColorNum; ++i){
+				market[giverIndex].addColorInfo(i, wants[i]-givingUp[i]);
+			}
+			if(off.getPickedByIndex() != -1){
+				givingUp = off.getDesire();
+				wants = off.getOffer();
+				for(int i = 0; i < intColorNum; ++i){
+					market[off.getPickedByIndex()].addColorInfo(i, givingUp[i]-wants[i]);
+				}
+			}
+		}
 	}
 
 	@Override
@@ -323,6 +341,12 @@ public class G7Player extends Player {
 		adblTastes = new double[intColorNum];
 		turnNumber = 0;
 		isTasted = new boolean[intColorNum];
+		
+		market = new marketKnowledge[PlayerNum];
+		for(int i = 0; i < PlayerNum; ++i){
+			market[i] = new marketKnowledge();
+		}
+		
 		for (int intColorIndex = 0; intColorIndex < intColorNum; intColorIndex++) {
 			isTasted[intColorIndex] = false;
 			adblTastes[intColorIndex] = -1;
