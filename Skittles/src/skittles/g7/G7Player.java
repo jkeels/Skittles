@@ -196,15 +196,28 @@ public class G7Player extends Player {
 		int[] bid = new int[intColorNum];
 		int[] ask = new int[intColorNum];
 
-		if (fav != -1 && hate != -1) {
-
-			while (aintInHand[hate] < numExchanged)
-				numExchanged--;
-
-			bid[hate] = numExchanged;
-			ask[fav] = numExchanged;
+		double highestFavColorValue = -1;
+		int highestFavColorIndex = -1;
+		for(marketKnowledge mk : market ) {
+			for(int i = 0; i < intColorNum; i++) {
+				//retrieves the highest color value and makes sure its not our favorite color
+				if(mk.getColorInfo(i) > highestFavColorValue && i != fav) { 
+					highestFavColorValue = mk.getColorInfo(i);
+					highestFavColorIndex = i;
+				}
+			}
+			
+			System.out.println("highest color value: " + highestFavColorValue + " with index:" + highestFavColorIndex);
 		}
-
+		
+		if(highestFavColorValue != -1) {
+			while(aintInHand[highestFavColorIndex] < numExchanged)
+				numExchanged--;
+			bid[highestFavColorIndex] = numExchanged;
+			ask[fav] = numExchanged;
+			
+		}
+		
 		System.out.println("In hand: ");
 		for (int i = 0; i < intColorNum; i++) {
 			System.out.print(aintInHand[i] + " ");
@@ -284,7 +297,7 @@ public class G7Player extends Player {
 		for(int i = 0; i < aintInHand.length; i++) {
 			//if its a color we like, update  potential score
 			if(adblTastes[i] > 0) {
-				differenceInScore += Math.pow((tempOffer[i] + aintInHand[i]), 2) - (adblTastes[i] * Math.pow(aintInHand[i], 2));
+				differenceInScore += (adblTastes[i] * Math.pow((tempOffer[i] + aintInHand[i]), 2) - (adblTastes[i] * Math.pow(aintInHand[i], 2)));
 				differenceInScore -= (adblTastes[i] * Math.pow(aintInHand[i], 2)) - (adblTastes[i] * Math.pow((aintInHand[i]- tempDesire[i]), 2));
 			} else {
 				differenceInScore += (adblTastes[i] * tempOffer[i]);
