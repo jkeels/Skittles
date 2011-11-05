@@ -92,16 +92,19 @@ public class G7Player extends Player {
 		}
 		System.out.println();
 		
+		turnNumber = 0;
+		int inHand = 0;
+		int indexToTaste = -1;
 		// Taste one of each for the first five turns
 		while (turnNumber < intColorNum) {
-			if (aintInHand[turnNumber] > 0) {
-
-				break;
+			if (!isTasted[turnNumber] && aintInHand[turnNumber] > inHand) {
+				inHand = aintInHand[turnNumber];
+				indexToTaste = turnNumber;
 			}
 			++turnNumber;
 		}
-
-		if (turnNumber < intColorNum) {
+		turnNumber = indexToTaste;
+		if (turnNumber < intColorNum && turnNumber >= 0) {
 			intLastEatIndex = turnNumber;
 			intLastEatNum = 1;
 			aintTempEat[intLastEatIndex] = intLastEatNum;
@@ -175,7 +178,7 @@ public class G7Player extends Player {
 		 * 
 		 */
 
-		int numExchanged = random.nextInt(5);
+		int numExchanged = random.nextInt(5)+1;
 		int fav = -1;
 		int hate = -1;
 		double min = 1.0;
