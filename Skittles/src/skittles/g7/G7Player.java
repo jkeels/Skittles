@@ -43,7 +43,6 @@ public class G7Player extends Player {
 		}
 
 		public void decay() {
-			ArrayList<Integer> tempArr = new ArrayList<Integer>();
 			for (int i = 0; i < colorKnowledge.size(); ++i) {
 				if (colorKnowledge.get(i) > 0) {
 					colorKnowledge.set(i, colorKnowledge.get(i) * 0.8);
