@@ -45,4 +45,14 @@ public class CandyBag {
 	public Candy getNthCandy(int n){
 		return orderedBag.toArray(new Candy[orderedBag.size()])[n];
 	}
+	
+	public Candy getLeastNegative(){
+		// Should return the candy that has a negative taste, that is closest to zero
+		return null;
+	}
+	
+	public Candy getLeastPositive(){
+		// Should return the candy that would yield the least happiness if it was all eaten now
+		return null;
+	}
 }
