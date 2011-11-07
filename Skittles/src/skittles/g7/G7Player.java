@@ -193,7 +193,7 @@ public class G7Player extends Player {
 		int tempIndex = 0;
 		int inHand = 0;
 		int indexToTaste = -1;
-		// Taste one of each for the first five turns
+		// Taste one of each skittle that we have in our hand, prioritizing to the skittle with the highest stack size
 		while (tempIndex < intColorNum) {
 			if (!isTasted[tempIndex] && aintInHand[tempIndex] > inHand) {
 				inHand = aintInHand[tempIndex];
@@ -213,15 +213,20 @@ public class G7Player extends Player {
 			indicesToHoard.add(intLastEatIndex);
 			return;
 		}
+		// After this point, we've tasted everything that we're going to taste
 
 		// Update our indices that we are hoarding
 		indicesToHoard.update();
 		indicesToHoard.reorder();
-
+		
+		// tasting means that our last skittle that we ate was due to us tasting a skittle, not because we were just eating one
 		if(tasting){
 			tasting = false;
 			intLastEatIndex = -1;
 		}
+		
+		// If we just ate some skittles, reset intLastEatIndex to -1 if we finished off the pile
+		
 		if(intLastEatIndex >= 0 && aintInHand[intLastEatIndex] == 0){
 			intLastEatIndex = -1;
 		}
@@ -242,10 +247,9 @@ public class G7Player extends Player {
 			}
 		}
 		
-		// For the stupid iteration, find the skittle that will lose us the
-		// least happiness and eat one of those
-		// This will give us some time to trade stuff
 		
+		// Find the skittle that will give us the least negative score (but still negative) and eat one of those.
+			// This will give us trading time, and also cause us to not eat a lot of negative skittles in one go.
 		double currentBest = -2.0;
 		if (intLastEatIndex < 0) {
 			for (int i = 0; i < intColorNum; ++i) {
@@ -257,13 +261,9 @@ public class G7Player extends Player {
 				}
 			}
 		}
+		// After this point, if intLastEatIndex == -1, then we have no more negative valued skittles.
 
-		// Now that we're out of negative-score skittles, find the skittle that
-		// gives us the least positive happiness
-		// and eat all of that color. This will still give us a little bit of
-		// trading time to get more of our higher value
-		// skittles
-
+		// Now find our smallest positive valued skittle that isnt one of our indicies to hoard
 		currentBest = 2.0;
 		if (intLastEatIndex < 0) {
 			for (int i = 0; i < intColorNum; ++i) {
@@ -277,7 +277,7 @@ public class G7Player extends Player {
 			}
 		}
 
-		// Now eat the hoard!
+		// Now eat the hoard! (well, we eat the one that gives us less happiness first)
 		if (intLastEatIndex < 0) {
 			intLastEatIndex = indicesToHoard.get(indicesToHoard.size()-1);
 			intLastEatNum = aintInHand[intLastEatIndex];
