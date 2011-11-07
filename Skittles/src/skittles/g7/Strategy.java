@@ -11,6 +11,7 @@ public class Strategy {
 	private List<Friend> friends;
 	
 	private CandyBag bag;
+	private TradeHistory tradeHistory;
 	
 	private int numCandiesEatenOnLastTurn;
 	private int colorEatenOnLastTurn;
@@ -23,6 +24,7 @@ public class Strategy {
 		this.numPlayers = numPlayers;
 		friends = new ArrayList<Friend>(numPlayers);
 		this.bag = bag;
+		tradeHistory = new TradeHistory();
 	}
 	
 	public void updateHappiness(double happiness){

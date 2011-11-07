@@ -53,10 +53,10 @@ public class Candy implements Comparable<Candy>{
 	@Override
 	public int compareTo(Candy c) {
 		if (this.value() < c.value())
-			return -1;
+			return 1;
 		if (this.value() == c.value())
 			return 0;
-		return 1;
+		return -1;
 	}
 	
 	public Double value(){
@@ -71,6 +71,8 @@ public class Candy implements Comparable<Candy>{
 		this.isTasted = isTasted;
 	}
 	
-	
+	public int compareByPreference(Candy c){
+		return 0;
+	}
 		
 }
