@@ -1,7 +1,5 @@
 bin/
-GameConfig
-<<<<<<< HEAD
+GameConfig.*
 p*.txt
-=======
 P*.txt
->>>>>>> 0411070b3dfe7a5f67206278cf01c39b635882d9
+.gitignore
