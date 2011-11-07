@@ -2,13 +2,18 @@ package skittles.g7;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 public class CandyBag {
 	private Map<Integer, Candy> bag = new HashMap<Integer, Candy>();
+	private SortedSet<Candy> orderedBag = new TreeSet<Candy>();
 	
 	public CandyBag(int[] candies){
 		for(int i=0; i < candies.length; i++){
-			bag.put(i, new Candy(i,candies[i]));
+			Candy candy = new Candy(i,candies[i]);
+			bag.put(i, candy);
+			orderedBag.add(candy);
 		}
 	}
 	
@@ -16,7 +21,9 @@ public class CandyBag {
 		if(bag.containsKey(color)){
 			bag.get(color).addCandy(candies);
 		}else{
-			bag.put(color, new Candy(color, candies));
+			Candy candy = new Candy(color, candies);
+			bag.put(color, candy);
+			orderedBag.add(candy);
 		}
 	}
 	
@@ -33,5 +40,9 @@ public class CandyBag {
 	
 	public int getNumColors(){
 		return bag.size();
+	}
+	
+	public Candy getNthCandy(int n){
+		return orderedBag.toArray(new Candy[orderedBag.size()])[n];
 	}
 }

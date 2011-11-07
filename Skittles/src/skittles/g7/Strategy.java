@@ -47,5 +47,6 @@ public class Strategy {
 	public void getNextTradeOffer(Offer temp){
 		// TODO: 
 	}
-
+	
+	
 }

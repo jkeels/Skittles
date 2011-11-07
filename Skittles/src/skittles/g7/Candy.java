@@ -1,14 +1,22 @@
 package skittles.g7;
 
-public class Candy {
+public class Candy implements Comparable<Candy>{
 	private Integer color;
 	private int inHand;
+	private Double pref;
 	
 	public Candy(int color, int inHand){
 		this.color = color;
 		this.inHand = inHand;
+		this.pref = 0.0;
 	}
 	
+	public Candy(Integer color, int inHand, Double pref) {
+		this.color = color;
+		this.inHand = inHand;
+		this.pref = pref;
+	}
+
 	public void consume(int numConsumed) throws IllegalArgumentException{
 		if(inHand < numConsumed){
 			throw new IllegalArgumentException("Tried to remove/consume more candy than what we have");
@@ -32,6 +40,26 @@ public class Candy {
 	public int hashCode() {
 		return color;
 	}
+
+	public Double getPref() {
+		return pref;
+	}
+
+	public void setPref(Double pref) {
+		this.pref = pref;
+	}
+
+	@Override
+	public int compareTo(Candy c) {
+		if (this.value() < c.value())
+			return -1;
+		if (this.value() == c.value())
+			return 0;
+		return 1;
+	}
 	
-	
+	public Double value(){
+		return pref * Math.pow(inHand, 2);
+	}
+		
 }

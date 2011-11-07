@@ -6,6 +6,7 @@ import java.util.Set;
 
 public class Preference {
 	
+		
 	private Map<Integer, Double> rawPreference = new HashMap<Integer, Double>();
     	
 	public int getCurrentFavorite(CandyBag bag){
@@ -45,7 +46,7 @@ public class Preference {
 		if(color == getCurrentFavorite(bag)) return 0;
 		
 		return (int) Math.ceil(Math.sqrt(Math.pow(bag.getCandy(getCurrentFavorite(bag)).getRemaining(), 2)
-				/rawPreference.get(color)));
+				/rawPreference.get(color)) - bag.getCandy(color).getRemaining());
 	}
 
 
