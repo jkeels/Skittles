@@ -500,7 +500,7 @@ public class G7Player extends Player {
 		tasting = false;
 		
 		// TODO: Come up with a heuristic and call new hoardingObject(int size)
-		indicesToHoard = new hoardingObject();
+		indicesToHoard = new hoardingObject(4);
 
 		market = new marketKnowledge[PlayerNum];
 		for (int i = 0; i < PlayerNum; ++i) {
