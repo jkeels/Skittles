@@ -11,7 +11,6 @@ public class Strategy {
 	private List<Friend> friends;
 	
 	private CandyBag bag;
-	private Preference pref;
 	
 	private int numCandiesEatenOnLastTurn;
 	private int colorEatenOnLastTurn;
@@ -29,11 +28,12 @@ public class Strategy {
 		currentHappiness += happiness;
 
 		double happinessPerCandy = happiness/ Math.pow(numCandiesEatenOnLastTurn, 2);
-		Double rawPref = pref.getRawPreference(colorEatenOnLastTurn); 
-		if (rawPref == Double.NaN) {
-			pref.updatePreference(colorEatenOnLastTurn, happinessPerCandy);
+		Candy lastCandyEaten = bag.getCandy(colorEatenOnLastTurn); 
+		if (!lastCandyEaten.isTasted()) {
+			lastCandyEaten.setPref(happinessPerCandy);
+			lastCandyEaten.setTasted(true);
 		} else {
-			if (rawPref != happinessPerCandy) {
+			if (lastCandyEaten.getPref() != happinessPerCandy) {
 				System.out.println("Error: Inconsistent color happiness!");
 			}
 		}

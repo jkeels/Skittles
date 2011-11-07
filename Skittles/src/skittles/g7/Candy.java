@@ -4,6 +4,7 @@ public class Candy implements Comparable<Candy>{
 	private Integer color;
 	private int inHand;
 	private Double pref;
+	private boolean isTasted;
 	
 	public Candy(int color, int inHand){
 		this.color = color;
@@ -61,5 +62,15 @@ public class Candy implements Comparable<Candy>{
 	public Double value(){
 		return pref * Math.pow(inHand, 2);
 	}
+
+	public boolean isTasted() {
+		return isTasted;
+	}
+
+	public void setTasted(boolean isTasted) {
+		this.isTasted = isTasted;
+	}
+	
+	
 		
 }
