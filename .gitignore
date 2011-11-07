@@ -3,3 +3,4 @@ GameConfig.*
 p*.txt
 P*.txt
 .gitignore
+Skittles/GameConfig.*
