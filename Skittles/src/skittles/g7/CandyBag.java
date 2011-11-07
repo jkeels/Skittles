@@ -56,7 +56,7 @@ public class CandyBag {
 	public Candy getNthCandy(int n){
 		return orderedBag.toArray(new Candy[orderedBag.size()])[n];
 	}
-	
+
 	public List<Candy> sortByPreference(){
 		List<Candy> sortedCandies = new ArrayList<Candy>();
 		sortedCandies.addAll(bag.values());
