@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.SortedSet;
@@ -81,10 +82,19 @@ public class CandyBag {
 	 */
 	
 	public Candy getLeastNegative(){
-		// TODO: Complete this
-		
+
 		List<Candy> candies = sortByPreference();
-		return null;
+		if(candies.size() == 1) return candies.get(0);
+		
+		Iterator<Candy> iter = candies.iterator();
+		Candy prev = null;
+		Candy current = null;
+		while(iter.hasNext()){
+			 prev = current;
+			 current = iter.next();
+			 if(current.getPref() > 0) break;
+		}
+		return prev;
 	}
 	
 	
@@ -94,7 +104,7 @@ public class CandyBag {
 	 * 
 	 */
 	public Candy getLeastPositive(){
-		// TODO: Complete this
+		Candy[] candies = orderedBag.toArray(new Candy[orderedBag.size()]);
 		return null;
 	}
 	
