@@ -4,7 +4,7 @@ public class Candy implements Comparable<Candy>{
 	private Integer color;
 	private int inHand;
 	private Double pref;
-	private boolean isTasted;
+	private boolean isTasted = false;
 	
 	public Candy(int color, int inHand){
 		this.color = color;
@@ -74,5 +74,12 @@ public class Candy implements Comparable<Candy>{
 	public int compareByPreference(Candy c){
 		return 0;
 	}
+
+	@Override
+	public String toString() {
+		return "{color="+color+" pref="+pref+" num="+inHand+"}";
+	}
+	
+	
 		
 }

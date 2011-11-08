@@ -34,6 +34,7 @@ public class Strategy {
 		double happinessPerCandy = happiness/ Math.pow(numCandiesEatenOnLastTurn, 2);
 		Candy lastCandyEaten = bag.getCandy(colorEatenOnLastTurn); 
 		if (!lastCandyEaten.isTasted()) {
+			System.out.println("Setting pref for color: "+colorEatenOnLastTurn);
 			lastCandyEaten.setPref(happinessPerCandy);
 			lastCandyEaten.setTasted(true);
 		} else {
@@ -57,13 +58,13 @@ public class Strategy {
 			}
 			++tempIndex;
 		}
+		System.out.println("Index to taste: "+indexToTaste);
 		tempIndex = indexToTaste;
 		if (tempIndex < bag.getNumColors() && tempIndex >= 0) {
 			tasting = true;
 			colorEatenOnLastTurn = tempIndex;
 			numCandiesEatenOnLastTurn = 1;
 			snack[colorEatenOnLastTurn] = numCandiesEatenOnLastTurn;
-			bag.getCandy(tempIndex).setTasted(true);
 			bag.removeCandy(tempIndex, 1);
 			return;
 		}
@@ -86,15 +87,19 @@ public class Strategy {
 		// If there is still more of the last thing we tasted, lets taste some more if its negative, or consult the oracle if its positive
 		
 		if(colorEatenOnLastTurn >= 0){
-			if(bag.getLeastNegative().compareTo(bag.getCandy(colorEatenOnLastTurn)) == 0){
-				numCandiesEatenOnLastTurn = 1;
-			} else {
-				// Use the oracle here to determine whether or not to eat one or eat all.  If the oracle returns true, we eat one.  Else we eat all.
-				boolean oracle = false;
-				if(oracle){
+			Candy candy = bag.getLeastNegative();
+			if (candy != null) {
+				if (candy.compareTo(bag.getCandy(colorEatenOnLastTurn)) == 0) {
 					numCandiesEatenOnLastTurn = 1;
 				} else {
-					numCandiesEatenOnLastTurn = bag.getCandy(colorEatenOnLastTurn).getRemaining();
+					// Use the oracle here to determine whether or not to eat one or eat all.  If the oracle returns true, we eat one.  Else we eat all.
+					boolean oracle = false;
+					if (oracle) {
+						numCandiesEatenOnLastTurn = 1;
+					} else {
+						numCandiesEatenOnLastTurn = bag.getCandy(
+								colorEatenOnLastTurn).getRemaining();
+					}
 				}
 			}
 		}
@@ -103,19 +108,27 @@ public class Strategy {
 		// Find the skittle that will give us the least negative score (but still negative) and eat one of those.
 			// This will give us trading time, and also cause us to not eat a lot of negative skittles in one go.
 		if (colorEatenOnLastTurn < 0) {
-			colorEatenOnLastTurn = bag.getLeastNegative().getColor();
-			numCandiesEatenOnLastTurn = 1;
+			System.out.println("Retrieving least negative");
+			Candy candy = bag.getLeastNegative();
+			if(candy != null){
+				colorEatenOnLastTurn = candy.getColor();
+				numCandiesEatenOnLastTurn = 1;
+			}
+			
 		}
 		// After this point, if colorEatenOnLastTurn == -1, then we have no more negative valued skittles.
 
 		// Now find our smallest positive valued skittle that isnt one of our indicies to hoard
 		if (colorEatenOnLastTurn < 0) {
+			System.out.println("Retrieving least positive");
 			colorEatenOnLastTurn = bag.getLeastPositive().getColor();
 			numCandiesEatenOnLastTurn = 1;
 		}
 		
 		// Update the aintInHand array
 		snack[colorEatenOnLastTurn] = numCandiesEatenOnLastTurn;
+		System.out.println("Color to be eaten: "+colorEatenOnLastTurn);
+		System.out.println("Num candies to be eaten: "+numCandiesEatenOnLastTurn);
 		bag.removeCandy(colorEatenOnLastTurn, numCandiesEatenOnLastTurn);
 	}
 	

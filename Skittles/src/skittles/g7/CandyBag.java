@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.SortedSet;
@@ -17,14 +16,14 @@ public class CandyBag {
 	 * Ordered in ascending order
 	 * 
 	 */
-	private SortedSet<Candy> orderedBag = new TreeSet<Candy>();
+	//private SortedSet<Candy> orderedBag = new TreeSet<Candy>(
+			//);
 	
 	
 	public CandyBag(int[] candies){
 		for(int i=0; i < candies.length; i++){
 			Candy candy = new Candy(i,candies[i]);
 			bag.put(i, candy);
-			orderedBag.add(candy);
 		}
 	}
 	
@@ -34,7 +33,6 @@ public class CandyBag {
 		}else{
 			Candy candy = new Candy(color, candies);
 			bag.put(color, candy);
-			orderedBag.add(candy);
 		}
 	}
 	
@@ -53,9 +51,9 @@ public class CandyBag {
 		return bag.size();
 	}
 	
-	public Candy getNthCandy(int n){
-		return orderedBag.toArray(new Candy[orderedBag.size()])[n];
-	}
+//	public Candy getNthCandy(int n){
+//		return orderedBag.toArray(new Candy[orderedBag.size()])[n];
+//	}
 
 	public List<Candy> sortByPreference(){
 		List<Candy> sortedCandies = new ArrayList<Candy>();
@@ -73,28 +71,51 @@ public class CandyBag {
 		
 	}
 	
+	public List<Candy> sortByGain(){
+		List<Candy> sortedCandies = new ArrayList<Candy>();
+		sortedCandies.addAll(bag.values());
+		Collections.sort(sortedCandies, new Comparator<Candy>(){
+				
+				public int compare(Candy c1, Candy c2) {
+					if (c1.value() < c2.value())
+						return 1;
+					if (c1.value() == c2.value())
+						return 0;
+					return -1;
+				}
+			});
+		return sortedCandies;
+	}
+	
 	
 	/**
-	 * 
-	 * Return the Candy that has a negative preference that's closest to zero
-	 * 
+	 *  
 	 * @return
+	 * 
+	 * Return the Candy that has a negative preference that's closest to zero 
+	 * or has a preference of zero
+	 * Return null if no such candy exists
+	 * 
 	 */
 	
 	public Candy getLeastNegative(){
 
-		List<Candy> candies = sortByPreference();
-		if(candies.size() == 1) return candies.get(0);
-		
-		Iterator<Candy> iter = candies.iterator();
-		Candy prev = null;
-		Candy current = null;
-		while(iter.hasNext()){
-			 prev = current;
-			 current = iter.next();
-			 if(current.getPref() > 0) break;
+		Candy[] candies = sortByPreference().toArray(new Candy[getNumColors()]);
+		if(candies.length == 1){
+			if(candies[0].getRemaining()>0) return candies[0];
+			else return null;
 		}
-		return prev;
+		
+		int ii = 0;
+		if(candies[ii].getPref() > 0) return null;
+		
+		for(int i = 1; i < candies.length && candies[i].getPref() <= 0; i++){
+			if(candies[i-1].getRemaining() > 0) ii = i-1;
+		}
+		
+		if(candies[ii].getPref() <= 0 && candies[ii].getRemaining() > 0) return candies[ii];
+		
+		return null;
 	}
 	
 	
@@ -102,9 +123,27 @@ public class CandyBag {
 	 * Return the Candy that will give you the least positive gain if you ate 
 	 * all of that candy
 	 * 
+	 * returns null if we dont have a candy with a positive gain
 	 */
 	public Candy getLeastPositive(){
-		Candy[] candies = orderedBag.toArray(new Candy[orderedBag.size()]);
+		Candy[] candies = sortByGain().toArray(new Candy[getNumColors()]);
+		System.out.println("Sorted by order of descending gain:");
+		for(int i=0; i<candies.length; i++)		System.out.println(candies[i]);
+		
+		if(candies.length == 1){
+			if(candies[0].value() > 0) return candies[0];
+			else return null;
+		}
+		
+		int ii = 0;
+		if(candies[ii].value() <= 0) return null;
+		
+		for(int i=1; i < candies.length && candies[i].value() >= 0; i++){
+			if(candies[i-1].getRemaining() > 0) ii = i-1;
+		}
+		
+		if(candies[ii].value() > 0 && candies[ii].getRemaining() > 0) return candies[ii];
+		
 		return null;
 	}
 	
