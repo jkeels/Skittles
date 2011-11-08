@@ -30,22 +30,21 @@ public class LittlePlayer extends Player {
 		strategy.updateHappiness(dblHappinessUp);
 	}
 
+	
 	@Override
 	public Offer pickOffer(Offer[] aoffCurrentOffers) {
-		// TODO Auto-generated method stub
-		return null;
+		return strategy.pickOffer(this, aoffCurrentOffers);
 	}
 
 	@Override
 	public void offerExecuted(Offer offPicked) {
-		// TODO Auto-generated method stub
+		strategy.offerExecuted(offPicked);
 
 	}
 
 	@Override
 	public void updateOfferExe(Offer[] aoffCurrentOffers) {
-		// TODO Auto-generated method stub
-
+		strategy.updateOfferExecutions(aoffCurrentOffers);
 	}
 
 	@Override

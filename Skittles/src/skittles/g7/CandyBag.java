@@ -1,24 +1,15 @@
 package skittles.g7;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.SortedSet;
-import java.util.TreeSet;
 
 public class CandyBag {
 	private Map<Integer, Candy> bag = new HashMap<Integer, Candy>();
-	
-	/**
-	 * Ordered in ascending order
-	 * 
-	 */
-	//private SortedSet<Candy> orderedBag = new TreeSet<Candy>(
-			//);
-	
 	
 	public CandyBag(int[] candies){
 		for(int i=0; i < candies.length; i++){
@@ -51,13 +42,10 @@ public class CandyBag {
 		return bag.size();
 	}
 	
-//	public Candy getNthCandy(int n){
-//		return orderedBag.toArray(new Candy[orderedBag.size()])[n];
-//	}
 
-	public List<Candy> sortByPreference(){
+	public static List<Candy> sortByPreference(Collection<Candy> collection){
 		List<Candy> sortedCandies = new ArrayList<Candy>();
-		sortedCandies.addAll(bag.values());
+		sortedCandies.addAll(collection);
 		Collections.sort(sortedCandies, new Comparator<Candy>(){
 
 			@Override
@@ -71,9 +59,20 @@ public class CandyBag {
 		
 	}
 	
-	public List<Candy> sortByGain(){
+	public List<Candy> sortByPreference(){
+		return sortByPreference(bag.values());
+	}
+	
+	/**
+	 *  
+	 * @param collection of candy
+	 * @return
+	 * Return a list of candies sorted by descending order of gain
+	 * 
+	 */
+	public static List<Candy> sortByGain(Collection<Candy> collection){
 		List<Candy> sortedCandies = new ArrayList<Candy>();
-		sortedCandies.addAll(bag.values());
+		sortedCandies.addAll(collection);
 		Collections.sort(sortedCandies, new Comparator<Candy>(){
 				
 				public int compare(Candy c1, Candy c2) {
@@ -87,6 +86,9 @@ public class CandyBag {
 		return sortedCandies;
 	}
 	
+	public List<Candy> sortByGain(){
+		return sortByGain(bag.values());
+	}
 	
 	/**
 	 *  
@@ -100,7 +102,7 @@ public class CandyBag {
 	
 	public Candy getLeastNegative(){
 
-		Candy[] candies = sortByPreference().toArray(new Candy[getNumColors()]);
+		Candy[] candies = sortByPreference(bag.values()).toArray(new Candy[getNumColors()]);
 		if(candies.length == 1){
 			if(candies[0].getRemaining()>0) return candies[0];
 			else return null;
@@ -126,7 +128,7 @@ public class CandyBag {
 	 * returns null if we dont have a candy with a positive gain
 	 */
 	public Candy getLeastPositive(){
-		Candy[] candies = sortByGain().toArray(new Candy[getNumColors()]);
+		Candy[] candies = sortByGain(bag.values()).toArray(new Candy[getNumColors()]);
 		System.out.println("Sorted by order of descending gain:");
 		for(int i=0; i<candies.length; i++)		System.out.println(candies[i]);
 		

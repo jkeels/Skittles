@@ -462,7 +462,7 @@ public class G7Player extends Player {
 		}
 	}
 
-	@Override
+	@Override	
 	public void updateOfferExe(Offer[] aoffCurrentOffers) {
 		for (marketKnowledge mk : market) {
 			mk.decay();

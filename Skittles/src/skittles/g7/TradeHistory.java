@@ -1,5 +1,10 @@
 package skittles.g7;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import skittles.sim.Offer;
+
 public class TradeHistory {
 	
 	/**

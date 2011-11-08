@@ -77,7 +77,7 @@ public class Candy implements Comparable<Candy>{
 
 	@Override
 	public String toString() {
-		return "{color="+color+" pref="+pref+" num="+inHand+"}";
+		return "{color="+color+" pref="+pref+" num="+inHand+" isTasted="+isTasted+"}";
 	}
 	
 	
