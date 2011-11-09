@@ -111,8 +111,8 @@ public class CandyBag {
 		int ii = 0;
 		if(candies[ii].getPref() > 0) return null;
 		
-		for(int i = 1; i < candies.length && candies[i].getPref() <= 0; i++){
-			if(candies[i-1].getRemaining() > 0) ii = i-1;
+		for(int i = 0; i < candies.length && candies[i].getPref() <= 0; i++){
+			if(candies[i].getRemaining() > 0) ii = i;
 		}
 		
 		if(candies[ii].getPref() <= 0 && candies[ii].getRemaining() > 0) return candies[ii];
@@ -140,8 +140,8 @@ public class CandyBag {
 		int ii = 0;
 		if(candies[ii].value() <= 0) return null;
 		
-		for(int i=1; i < candies.length && candies[i].value() >= 0; i++){
-			if(candies[i-1].getRemaining() > 0) ii = i-1;
+		for(int i=0; i < candies.length && candies[i].value() >= 0; i++){
+			if(candies[i].getRemaining() > 0) ii = i;
 		}
 		
 		if(candies[ii].value() > 0 && candies[ii].getRemaining() > 0) return candies[ii];
