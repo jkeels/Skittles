@@ -32,10 +32,17 @@ public class TradeHistory {
 		tradesOfferedByMe.add(offer);
 	}
 	
-	public Offer getNextTradeOffer(int color, Offer offer){
+	public Offer getNextTradeOffer(Offer currentOffer){
 		//Offer newOffer = new Offer(offer.getOfferedByIndex(), 8);
 		int n = tradesOfferedByMe.size();
 		for(int i = n-1; i >= n-1-LOOKBACK; i--){
+			Offer oldOffer = tradesOfferedByMe.get(i);
+			if(!wasOfferAccepted(oldOffer)){
+				int[] oldOfferedColors = oldOffer.getDesire();
+				for(int color = 0; color < oldOfferedColors.length; color++){
+					
+				}
+			}
 			
 		}
 		return null;
