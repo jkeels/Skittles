@@ -1,6 +1,7 @@
 package skittles.g7;
 
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -65,6 +66,29 @@ public class Strategy {
 
 	}
 
+	public boolean eatingOracle(int colorIndex){
+		List<Offer> ll = tradeHistory.getTradesOfferedByMe();
+		boolean offeredBefore = false;
+		for(int i = ll.size() - 1; i > ll.size() - 4 && i > 0; --i){
+			Offer off = ll.get(i);
+			if (off.getOffer()[colorIndex] > 0) {
+				offeredBefore = true;
+				if (TradeHistory.wasOfferAccepted(off)) {
+					return true;
+				}
+			}
+		}		
+		if(!offeredBefore){
+			for(MarketKnowledge mk : market){
+				if(mk.getColorInfo(colorIndex) > 1){
+					return true;
+				}
+			}
+		}
+		
+		return false;
+	}
+	
 	public void getNextSnack(int[] snack) {
 		int tempIndex = 0;
 		int inHand = 0;
@@ -118,7 +142,7 @@ public class Strategy {
 				// Use the oracle here to determine whether or not to eat one or
 				// eat all. If the oracle returns true, we eat one. Else we eat
 				// all.
-				boolean oracle = false;
+				boolean oracle = eatingOracle(colorEatenOnLastTurn);
 				if (oracle) {
 					numCandiesEatenOnLastTurn = 1;
 				} else {

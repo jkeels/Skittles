@@ -24,6 +24,10 @@ public class TradeHistory {
 	
 	private List<Offer> tradesOfferedByMe = new LinkedList<Offer>();
 	
+	public List<Offer> getTradesOfferedByMe() {
+		return tradesOfferedByMe;
+	}
+
 	public static boolean wasOfferAccepted(Offer offer){
 		return offer.getPickedByIndex() != -1;
 	}
