@@ -44,7 +44,7 @@ public class LittlePlayer extends Player {
 
 	@Override
 	public void updateOfferExe(Offer[] aoffCurrentOffers) {
-		strategy.updateOfferExecutions(aoffCurrentOffers);
+		strategy.updateOfferExecutions(this, aoffCurrentOffers);
 	}
 
 	@Override

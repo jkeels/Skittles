@@ -19,6 +19,7 @@ public class Strategy {
 	private CandyBag bag;
 	private TradeHistory tradeHistory;
 
+
 	private int numCandiesEatenOnLastTurn;
 	private int colorEatenOnLastTurn;
 	private int numColorsToHoard;
@@ -238,8 +239,7 @@ public class Strategy {
 			bag.removeCandy(color, aintOffer[color]);
 		}
 	}
-
-	public void updateOfferExecutions(Offer[] aoffCurrentOffers) {
+	public void updateOfferExecutions(Player me, Offer[] aoffCurrentOffers){
 
 		int numColors = bag.getNumColors();
 		for (MarketKnowledge mk : market) {
@@ -261,6 +261,13 @@ public class Strategy {
 							- wants[i]);
 				}
 			}
+			
+			
+			if(off.getOfferedByIndex() == me.getPlayerIndex()){
+				tradeHistory.recordTradeOfferedByMe(off);
+			}
+				
+			
 		}
 
 	}
