@@ -167,43 +167,7 @@ public class Strategy {
 	}
 	
 	public void getNextTradeOffer(Offer temp){
-		
-		int numExchanged = random.nextInt(5) + 1;
-		int numColors = bag.getNumColors();
-		List<Candy> candies = bag.sortByGain();
-		int[] bid = new int[numColors];
-		int[] ask = new int[numColors];
-		
-		int fav = candies.get(0).getColor();
-
-		double highestFavColorValue = -1;
-		int highestFavColorIndex = -1;
-		for (MarketKnowledge mk : market) {
-			for (int i = 0; i < numColors; i++) {
-				// retrieves the highest color value and makes sure its not our
-				// favorite color
-				if (mk.getColorInfo(i) > highestFavColorValue && i != fav) {
-					highestFavColorValue = mk.getColorInfo(i);
-					highestFavColorIndex = i;
-				}
-			}
-			
-			if (DEBUG) {
-				System.out.println("highest color value: "
-						+ highestFavColorValue + " with index:"
-						+ highestFavColorIndex);
-			}
-		}
-
-		if (highestFavColorValue != -1) {
-			while (bag.getCandy(highestFavColorIndex).getRemaining() < numExchanged)
-				numExchanged--;
-			bid[highestFavColorIndex] = numExchanged;
-			ask[fav] = numExchanged;
-
-		}
-
-		temp.setOffer(bid, ask);
+		tradeHistory.getNextTradeOffer(temp, bag, market);	
 	}
 	
 	public void offerExecuted(Offer offPicked) {
