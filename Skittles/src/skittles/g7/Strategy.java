@@ -29,11 +29,11 @@ public class Strategy {
 
 	private boolean tasting = false;
 
-	public Strategy(int numPlayers, CandyBag bag) {
+	public Strategy(int myID, int numPlayers, CandyBag bag) {
 		this.numPlayers = numPlayers;
 		// friends = new ArrayList<Friend>(numPlayers);
 		this.bag = bag;
-		tradeHistory = new TradeHistory();
+		tradeHistory = new TradeHistory(myID, numPlayers, bag.getNumColors());
 		market = new MarketKnowledge[numPlayers];
 		for (int i = 0; i < numPlayers; i++) {
 			market[i] = new MarketKnowledge(bag.getNumColors());
@@ -215,8 +215,8 @@ public class Strategy {
 		bag.removeCandy(colorEatenOnLastTurn, numCandiesEatenOnLastTurn);
 	}
 	
-	public void getNextTradeOffer(Offer temp){
-		tradeHistory.getNextTradeOffer(temp, bag, market);	
+	public void getNextTradeOffer(Player me, Offer temp){
+		tradeHistory.getNextTradeOffer(me, temp, bag, market);	
 	}
 
 	public void offerExecuted(Offer offPicked) {
@@ -251,10 +251,7 @@ public class Strategy {
 			}
 			
 			
-			if(off.getOfferedByIndex() == me.getPlayerIndex()){
-				tradeHistory.recordTradeOfferedByMe(off);
-			}
-				
+			tradeHistory.recordTradeOffered(me, off);
 			
 		}
 

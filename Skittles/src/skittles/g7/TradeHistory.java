@@ -1,10 +1,14 @@
 package skittles.g7;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 import skittles.sim.Offer;
+import skittles.sim.Player;
 
 public class TradeHistory {
 	
@@ -22,11 +26,24 @@ public class TradeHistory {
 	
 	private static final int LOOKBACK = 3;
 	private static final int STEP = 2;
+	private static final int OFFER_SIZE = 5;
 	private static Random random = new Random();
 	private static final boolean DEBUG = true;
+	private int[][] liquidity;
+	
 	
 	private List<Offer> tradesOfferedByMe = new LinkedList<Offer>();
-	private List<Offer>[] tradesByOthers;
+	private Map<Integer, List<Offer>> tradesByOthers;
+	
+	public TradeHistory(int myID, int numPlayers, int numColors){
+		tradesByOthers = new HashMap<Integer, List<Offer>>();
+		
+		liquidity = new int[numPlayers][];
+		for(int i = 0; i < numPlayers; i++){
+			if(i != myID) tradesByOthers.put(i, new ArrayList<Offer>());
+			liquidity[i] = new int[numColors];
+		}
+	}
 	
 	public List<Offer> getTradesOfferedByMe() {
 		return tradesOfferedByMe;
@@ -36,11 +53,37 @@ public class TradeHistory {
 		return offer.getPickedByIndex() != -1;
 	}
 	
-	public void recordTradeOfferedByMe(Offer offer){
-		tradesOfferedByMe.add(offer);
+	public void recordTradeOffered(Player me, Offer offer){
+		int player = offer.getOfferedByIndex(); 
+		if(player == me.getPlayerIndex()){
+			tradesOfferedByMe.add(offer);
+		}else{
+			tradesByOthers.get(offer.getOfferedByIndex()).add(offer);
+			int[] bid = offer.getOffer();
+			int[] ask = offer.getDesire();
+			for(int color = 0; color < bid.length; color++){
+				if(bid[color] != 0 || ask[color] != 0 )
+						liquidity[player][color] = bid[color] - ask[color];
+			}
+		}
 	}
 	
-	public void getNextTradeOffer(Offer currentOffer, CandyBag bag, MarketKnowledge[] market){
+	
+	public int getTradeSize(Player me, int color){
+		int numExchanged = random.nextInt(OFFER_SIZE)+1;
+		int min=0;
+		for(int player = 0; player < liquidity.length; player++){
+			if(player != me.getPlayerIndex() && liquidity[player][color] > min){
+				min = liquidity[player][color];
+			}
+		}
+		if(min > 0){
+			numExchanged = min;
+		}
+		return numExchanged;
+	}
+	
+	public void getNextTradeOffer(Player me, Offer currentOffer, CandyBag bag, MarketKnowledge[] market){
 		
 		int numColors = bag.getNumColors();
 		List<Candy> candies = bag.sortByGain();
@@ -48,14 +91,15 @@ public class TradeHistory {
 		int[] ask = new int[numColors];
 		
 		int fav = candies.get(0).getColor();
-		int numExchanged = 0;
+		int numExchanged = getTradeSize(me, fav);
 		
 		if(!tradesOfferedByMe.isEmpty()){
 			Offer oldOffer = tradesOfferedByMe.get(tradesOfferedByMe.size()-1);
 			if(!wasOfferAccepted(oldOffer) && oldOffer.getDesire()[fav] > 0 ){
 				numExchanged = oldOffer.getDesire()[fav] - STEP;
-				if(numExchanged <= 0){
+				if(numExchanged <= 0 && candies.size() > 1){
 					fav = candies.get(1).getColor();
+					numExchanged = getTradeSize(me, fav);
 				}
 			}
 		}
