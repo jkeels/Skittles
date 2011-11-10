@@ -205,8 +205,13 @@ public class TradeHistory {
 				int[] newAsk = new int[bag.getNumColors()];
 				newBid[giveColor.getColor()] = numExchanged;
 				newAsk[wantColor.getColor()] = numExchanged;
-				currentOffer.setOffer(newBid, newAsk);
-				System.out.println();
+				Offer prevOffer = tradesOfferedByMe.get(tradesOfferedByMe.size() -1 );
+				if(!(prevOffer.getDesire()[wantColor.getColor()] == numExchanged && prevOffer.getOffer()[giveColor.getColor()] == numExchanged)){
+					currentOffer.setOffer(newBid, newAsk);
+					System.out.println();
+				}else{
+					numExchanged = 0;
+				}
 			}
 		}
 		
