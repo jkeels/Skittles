@@ -195,7 +195,7 @@ public class TradeHistory {
 				skip = true;
 			}
 			if (!skip) {
-				Candy giveColor = prefList.get(index - 1);
+				Candy giveColor = prefList.get(prefList.size() - index - 1);
 				numExchanged = bag.switchThreshhold(giveColor, wantColor);
 				int[] newBid = new int[bag.getNumColors()];
 				int[] newAsk = new int[bag.getNumColors()];
@@ -222,12 +222,46 @@ public class TradeHistory {
 				skip = true;
 			}
 			if(!skip){
-				 for(int player = 0; player < liquidity.)
+				 int min = 0;
+				 int prospectivePartner = -1;
+				 int color = getRidOf.getColor();
+				 int [] colorsToGain = new int[numColors];
+				 int toGain = 0;
+				 
+				 for(int player = 0; player < liquidity.length; player++){
+						if(player != me.getPlayerIndex() && -liquidity[player][color] > min){
+							min = -liquidity[player][color];
+							prospectivePartner = player;
+						}
+					}
+				 
+				 
+				 if(min != 0){
+					 	toGain = 0;
+						for(int c = 0; c < liquidity[prospectivePartner].length; c++){
+							if(c != color && liquidity[prospectivePartner][c] > 0 &&
+										goodToTrade(gainList, bag, color, bag.getNumColors() - index)){
+								colorsToGain[c] = liquidity[prospectivePartner][c];
+								toGain += colorsToGain[c];
+							}
+						}
+					numExchanged = min > toGain ? toGain : min;
+					int[] newBid = new int[bag.getNumColors()];
+					newBid[color] = numExchanged;
+					currentOffer.setOffer(newBid, colorsToGain);
+				 }
 			}
 		}
 	}
 	
 	
-	
+	private boolean goodToTrade(List<Candy> gainList, CandyBag bag, int color, int limit){
+		int i;
+		for(i=0; i<gainList.size(); i++){
+			if(gainList.get(i).getColor() == color) break;
+		}
+		if(i < limit) return true;
+		return false;
+	}
 
 }
