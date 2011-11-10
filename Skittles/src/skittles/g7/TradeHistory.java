@@ -169,8 +169,61 @@ public class TradeHistory {
 			ask[fav] = numExchanged;
 
 		}
-
+		
 		currentOffer.setOffer(bid, ask);
+		}
+		if(numExchanged == 0){
+			if (DEBUG || true) {
+				System.out
+						.println("+_++++++++++++++++++++++*****************$$$$$$$$$$$$$$$$$$$$$@@@@@@@@@@@@@@@@@@@++++++++++++++++++_++++++++++++++++++++++*****************$$$$$$$$$$$$$$$$$$$$$@@@@@@@@@@@@@@@@@@@++++++++++++++++++_++++++++++++++++++++++*****************$$$$$$$$$$$$$$$$$$$$$@@@@@@@@@@@@@@@@@@@++++++++++++++++++_++++++++++++++++++++++*****************$$$$$$$$$$$$$$$$$$$$$@@@@@@@@@@@@@@@@@@@+++++++++++++++++");
+			}
+			List<Candy> prefList = bag.sortByPreference();
+			List<Candy> gainList = bag.sortByGain();
+			int index = 1;
+			Candy wantColor = prefList.get(prefList.size() - index);
+			while(wantColor.equals(gainList.get(index-1))){
+				++index;
+				try {
+					wantColor = prefList.get(prefList.size() - index);
+				} catch (IndexOutOfBoundsException e) {
+					// TODO Auto-generated catch block
+					wantColor = null;
+				}
+			}
+			boolean skip = false;
+			if(wantColor == null || wantColor.getPref() <= 0){
+				skip = true;
+			}
+			if (!skip) {
+				Candy giveColor = prefList.get(index - 1);
+				numExchanged = bag.switchThreshhold(giveColor, wantColor);
+				int[] newBid = new int[bag.getNumColors()];
+				int[] newAsk = new int[bag.getNumColors()];
+				newBid[giveColor.getColor()] = numExchanged;
+				newAsk[wantColor.getColor()] = numExchanged;
+				currentOffer.setOffer(newBid, newAsk);
+			}
+		}
+		
+		if(numExchanged == 0){
+			List<Candy> gainList = bag.sortByGain();
+			int index = 1;
+			Candy getRidOf = gainList.get(bag.getNumColors() - index);
+			while (getRidOf.value() == 0){
+				if(index >= bag.getNumColors() - 1){
+					getRidOf = null;
+					break;
+				}
+				++index;
+				getRidOf = gainList.get(bag.getNumColors() - index);
+			}
+			boolean skip = false;
+			if(getRidOf == null){
+				skip = true;
+			}
+			if(!skip){
+				 for(int player = 0; player < liquidity.)
+			}
 		}
 	}
 	

@@ -17,6 +17,13 @@ public class Candy implements Comparable<Candy>{
 		this.inHand = inHand;
 		this.pref = pref;
 	}
+	
+	public Candy(Candy c){
+		this.color = c.color;
+		this.inHand = c.inHand;
+		this.pref = c.pref;
+		this.isTasted = c.isTasted;
+	}
 
 	public void consume(int numConsumed) throws IllegalArgumentException{
 		if(inHand < numConsumed){
@@ -57,6 +64,13 @@ public class Candy implements Comparable<Candy>{
 		if (this.value() == c.value())
 			return 0;
 		return -1;
+	}
+	
+	public boolean equals(Object obj) {
+		if (!(obj instanceof Candy)){
+			return false;
+		}
+		return (this.compareTo((Candy) obj) == 0);
 	}
 	
 	public Double value(){

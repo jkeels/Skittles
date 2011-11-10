@@ -42,7 +42,7 @@ public class CandyBag {
 		return bag.size();
 	}
 	
-
+	// ascending order
 	public static List<Candy> sortByPreference(Collection<Candy> collection){
 		List<Candy> sortedCandies = new ArrayList<Candy>();
 		sortedCandies.addAll(collection);
@@ -147,6 +147,25 @@ public class CandyBag {
 		if(candies[ii].value() > 0 && candies[ii].getRemaining() > 0) return candies[ii];
 		
 		return null;
+	}
+	
+	public int switchThreshhold(Candy c1, Candy c2){
+		Candy lesserPref = new Candy(c1);
+		Candy greaterPref = new Candy(c2);
+		int toSwitch = 0;
+		
+		while(lesserPref.value() > greaterPref.value()){
+			if(lesserPref.getRemaining() == 0){
+				toSwitch = 0;
+				break;
+			}
+			++toSwitch;
+			lesserPref.consume(1);
+			greaterPref.addCandy(1);
+		}
+		
+		
+		return toSwitch;
 	}
 	
 }
