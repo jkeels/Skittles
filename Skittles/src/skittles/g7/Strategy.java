@@ -66,6 +66,8 @@ public class Strategy {
 
 	}
 
+	//determines should we eat all of the color skittles now or if we have a chance to collect more
+	//checks against the market knowledge and the trade history
 	public boolean eatingOracle(int colorIndex){
 		List<Offer> ll = tradeHistory.getTradesOfferedByMe();
 		boolean offeredBefore = false;
@@ -192,8 +194,9 @@ public class Strategy {
 			}
 			colorEatenOnLastTurn = bag.getLeastPositive().getColor();
 			boolean highValue = false;
+			List<Candy> list = bag.sortByGain();
 			for (int i = 0; i < numColorsToHoard; ++i) {
-				if (bag.getCandy(i).getColor() == colorEatenOnLastTurn) {
+				if (list.get(i).getColor() == colorEatenOnLastTurn) {
 					highValue = true;
 				}
 			}
@@ -284,6 +287,7 @@ public class Strategy {
 			int[] currentDesire = offTemp.getDesire();
 			// int[] currentOffer = offTemp.getOffer();
 			double currentPotentialScore = checkOffer(bag, offTemp);
+			
 			// Check to see if we have enough to even go through with this trade
 			// before we deliberate
 			if (checkEnoughInHand(currentDesire)) {

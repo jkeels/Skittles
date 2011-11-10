@@ -66,7 +66,7 @@ public class FatKidPositive extends Player
 
 
 	@Override
-	public void initialize(int intPlayerNum,double wtfShen, int intPlayerIndex, String strClassName,	int[] aintInHand) 
+	public void initialize(int intPlayerNum, double wtfShen, int intPlayerIndex, String strClassName,	int[] aintInHand) 
 	{
 		this.intPlayerIndex = intPlayerIndex;
 		this.strClassName = strClassName;
