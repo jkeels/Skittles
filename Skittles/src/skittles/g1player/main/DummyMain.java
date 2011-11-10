@@ -11,7 +11,7 @@ public class DummyMain {
 		int[] aintTempEat = new int[aintInHand.length];
 		
 		G1Player g1Player = new G1Player();
-		g1Player.initialize(3, 0.0, 1, "g1player", aintInHand);
+		g1Player.initialize(3, 1, "g1player", aintInHand);
 		
 		Infobase info = new Infobase();
 		info.setAintInHand(aintInHand);

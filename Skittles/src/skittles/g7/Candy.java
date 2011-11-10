@@ -70,7 +70,8 @@ public class Candy implements Comparable<Candy>{
 		if (!(obj instanceof Candy)){
 			return false;
 		}
-		return (this.compareTo((Candy) obj) == 0);
+		Candy c = (Candy) obj;
+		return (this.color == c.color);
 	}
 	
 	public Double value(){

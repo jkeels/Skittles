@@ -84,7 +84,7 @@ public class G1Player extends Player {
 	}
 
 	@Override
-	public void initialize(int intPlayerNum, double wtfShen, int intPlayerIndex,
+	public void initialize(int intPlayerNum, int intPlayerIndex,
 			String strClassName, int[] aintInHand) {
 		
 		info = new Infobase();

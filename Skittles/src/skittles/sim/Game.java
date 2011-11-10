@@ -5,8 +5,12 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.Random;
 import java.util.Scanner;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import javax.xml.parsers.*;
 
@@ -23,11 +27,13 @@ public class Game
 	private PlayerStatus[] aplsPlayerStatus;
 	private int intPlayerNum;
 	private int intColorNum;
+	private boolean firstRound = true;
 	
 	private Offer[] aoffCurrentOffers = null;
 	private int[][] aintCurrentEats = null;
 	
-	private double dblTasteMean;
+	private int[] totalSkittlesInMarket = null;
+	private int skittlesPerPlayer;
 	
 	public static Scanner scnInput = new Scanner( System.in );
 	
@@ -63,6 +69,7 @@ public class Game
 				//retrieve player information
 				intColorNum = Integer.parseInt( getTagValue( elmGame, "ColorNum" ) );
 				intTotalNum = Integer.parseInt( getTagValue( elmGame, "SkittleNum" ) );	
+				skittlesPerPlayer = intTotalNum;
 			}
 		}
 		// initialize players
@@ -73,6 +80,7 @@ public class Game
 		if(ndlPlayers != null && ndlPlayers.getLength() > 0) 
 		{
 			intPlayerNum = ndlPlayers.getLength();
+			totalSkittlesInMarket = new int[intColorNum];
 			for(int i = 0 ; i < ndlPlayers.getLength();i++) 
 			{
 
@@ -93,14 +101,34 @@ public class Game
 				else
 				{
 					double dblMean = Double.parseDouble( astrTastes[ 1 ] );
-					this.dblTasteMean = dblMean;
 					adblTastes = randomTastes( dblMean );
-					System.out.println( "Random color happiness:" );
-					for ( int intColorIndex = 0; intColorIndex < intColorNum; intColorIndex ++ )
+					boolean nl = false;
+					if (Stats.happinessDistribution)
 					{
-						System.out.print( adblTastes[ intColorIndex ] + " " );
+						nl = true;
+						System.out.println( "Random color happiness for player " + i + ":" );
+						for ( int intColorIndex = 0; intColorIndex < intColorNum; intColorIndex ++ )
+						{
+							System.out.print( adblTastes[ intColorIndex ] + "  ");
+						}	
+						System.out.println();
 					}
-					System.out.println();
+					if (Stats.averageHappiness)
+					{
+						nl = true;
+						double totalHappy = 0;
+						for ( int intColorIndex = 0; intColorIndex < intColorNum; intColorIndex ++ )
+						{
+							totalHappy += adblTastes[ intColorIndex ];
+						}	
+						double avgHappy = totalHappy / intColorNum;
+						System.out.println( "Average color happiness for player " + i + ": " + avgHappy );
+					}
+					if (nl)
+					{
+						System.out.println();
+						System.out.println("---------------------------------------------------");
+					}
 				}
 				String strInHand = getTagValue( elmPlayer, "InHand" );
 				int[] aintInHand = new int[ intColorNum ];
@@ -139,10 +167,15 @@ public class Game
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-				plyNew.initialize( intPlayerNum, dblTasteMean, i, strPlayerClass, aintInHand.clone() );
+				plyNew.initialize( intPlayerNum, i, strPlayerClass, aintInHand.clone() );
 				alPlayers.add( plyNew );
 				PlayerStatus plsTemp = new PlayerStatus( i, strPlayerClass, aintInHand.clone(), adblTastes.clone() );
 				alPlayerStatus.add( plsTemp );
+				
+				for(int q = 0; q < intColorNum; ++q)
+				{
+					totalSkittlesInMarket[q] += aintInHand[q];
+				}
 			}
 		}
 		aplyPlayers = alPlayers.toArray( new Player[ 0 ] );
@@ -172,7 +205,10 @@ public class Game
 		logGame( abfwPortfolio, "N" );
 		while ( !checkFinish() )
 		{
-			showEveryInHand();		
+			if (firstRound)
+			{
+				showEveryInHand();		
+			}
 			everyoneEatAndOffer();
 			logGame( abfwPortfolio, "E" );
 			int[] aintOrder = generateRandomOfferPickOrder();			// need code to log the order for repeated game
@@ -183,15 +219,92 @@ public class Game
 			logGame( abfwPortfolio, "H" );
 			logGame( abfwPortfolio, "N" );
 		}
-		double dblTotal = 0;
-		for ( PlayerStatus plsTemp : aplsPlayerStatus )
+		
+		if (Stats.netTrade)
 		{
-			dblTotal += plsTemp.getHappiness();
+			for (PlayerStatus plsTemp : aplsPlayerStatus)
+			{
+				if (Stats.playerFilter == -1 || Stats.playerFilter == plsTemp.getPlayerIndex())
+				{
+					String netGive = intArrToString(plsTemp.getCumulativeTradeAway());
+					String netGain = intArrToString(plsTemp.getCumulativeTradeGain());
+					System.out.println("Player #" + plsTemp.getPlayerIndex() + "'s net trade: " + netGive + " <--> " + netGain);
+				}
+			}
 		}
+		
+		double dblTotalScores = 0;
 		for ( PlayerStatus plsTemp : aplsPlayerStatus )
 		{
-			double dblTempHappy = ( plsTemp.getHappiness() + ( dblTotal - plsTemp.getHappiness() ) / ( intPlayerNum - 1 ) ) / 2;
-			System.out.println( "Player #" + plsTemp.getPlayerIndex() + "'s happiness is: " + dblTempHappy );
+			dblTotalScores += plsTemp.getHappiness();
+		}
+		
+		TreeSet<Score> rawScores = new TreeSet<Score>();
+		TreeSet<Score> finalScores = new TreeSet<Score>();
+		for ( PlayerStatus plsTemp : aplsPlayerStatus )
+		{
+			double dblTempHappy = plsTemp.getHappiness() + ((dblTotalScores - plsTemp.getHappiness()) / (intPlayerNum - 1));
+			rawScores.add(new Score(plsTemp.getPlayerIndex(), plsTemp.getHappiness()));
+			finalScores.add(new Score(plsTemp.getPlayerIndex(), dblTempHappy));
+			boolean nl = true;
+			if (Stats.rawScore && (Stats.playerFilter == -1 || Stats.playerFilter == plsTemp.getPlayerIndex()))
+			{
+				if (nl)
+				{
+					System.out.println();
+				}
+				nl = false;
+				System.out.println( "Player #" + plsTemp.getPlayerIndex() + "'s RAW happiness is: " + plsTemp.getHappiness() );
+			}
+			if (Stats.othersAvgScore && (Stats.playerFilter == -1 || Stats.playerFilter == plsTemp.getPlayerIndex()))
+			{
+				if (nl)
+				{
+					System.out.println();
+				}
+				System.out.println( "Average of scores (minus Player#" + plsTemp.getPlayerIndex() + ") is: " + (dblTotalScores - plsTemp.getHappiness()) / (intPlayerNum - 1) );
+				nl = false;
+			}
+			if (Stats.finalScore && (Stats.playerFilter == -1 || Stats.playerFilter == plsTemp.getPlayerIndex()))
+			{
+				if (nl)
+				{
+					System.out.println();
+				}
+				System.out.println( "Player #" + plsTemp.getPlayerIndex() + "'s TOTAL happiness is: " + dblTempHappy );
+				nl = false;
+			}
+		}
+		
+		if (Stats.rawScoreRank)
+		{
+			System.out.println();
+			System.out.println("---------------------------------------------------");
+			System.out.println("Rank based on raw scores: ");
+			Iterator<Score> i = rawScores.iterator();
+			Score s = null;
+			while (i.hasNext())
+			{
+				s = i.next();
+				System.out.println(s.getPlayerIndex() + " with raw score " + s.getScore());
+			}
+			System.out.println();
+			System.out.println("---------------------------------------------------");
+		}
+		if (Stats.finalScoreRank)
+		{
+			System.out.println();
+			System.out.println("---------------------------------------------------");
+			System.out.println("Rank based on final scores: ");
+			Iterator<Score> i = finalScores.iterator();
+			Score s = null;
+			while (i.hasNext())
+			{
+				s = i.next();
+				System.out.println(s.getPlayerIndex() + " with final score " + s.getScore());
+			}
+			System.out.println();
+			System.out.println("---------------------------------------------------");
 		}
 		
 		try {
@@ -384,16 +497,91 @@ public class Game
 	
 	private void showEveryInHand() 
 	{
-		System.out.println( "<<<<<<<<<<<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n" );
+/*		System.out.println( "<<<<<<<<<<<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n" );
 		System.out.println( "******************************************" );
-		System.out.println( "------------------------------------------");
-		System.out.println( "Skittles portfolio:" );
-		for ( PlayerStatus plsTemp : aplsPlayerStatus )
+		System.out.println( "------------------------------------------");*/
+		firstRound = false;
+		boolean nl = false;
+		if (Stats.skittlesDistribution)
 		{
-			System.out.println( plsTemp.toString() );
+			nl = true;
+			System.out.println( "Skittles portfolio:" );
+			for ( PlayerStatus plsTemp : aplsPlayerStatus )
+			{
+				System.out.println( plsTemp.toString() );
+			}
+			System.out.println();
 		}
-		System.out.println( "------------------------------------------");
-		System.out.println( "******************************************\n" );
+		
+		if (Stats.noTradePotentialScore)
+		{
+			nl = true;
+			for (PlayerStatus plsTemp : aplsPlayerStatus)
+			{
+				double potentialScore = 0;
+				double[] taste = plsTemp.getAdblTaste();
+				int[] skittlesInHand = plsTemp.getInHand();
+				for (int color = 0; color < intColorNum; ++color)
+				{
+					if (taste[color] > 0)
+					{
+						potentialScore += taste[color] * (Math.pow(skittlesInHand[color], 2));
+					}
+					else
+					{
+						potentialScore += taste[color] * skittlesInHand[color];
+					}
+				}
+				System.out.println("Player #" + plsTemp.getPlayerIndex() + "'s potential score without trading is " + potentialScore);
+			}
+		}
+		if (Stats.maxHoardPotentialScore)
+		{
+			for (PlayerStatus plsTemp : aplsPlayerStatus)
+			{
+				double potentialScore = 0;
+				int skittlesEaten = 0;
+				int[] sortedIndicies = sortedHappyScore(plsTemp.getAdblTaste().clone());
+				double[] tastes = plsTemp.getAdblTaste().clone();
+				for (int i = 0; i < intColorNum && skittlesEaten < skittlesPerPlayer; ++i)
+				{
+					int happyColor = sortedIndicies[i];
+					if (totalSkittlesInMarket[happyColor] >= skittlesPerPlayer)
+					{
+						if (plsTemp.getAdblTaste()[happyColor] >= 0)
+						{
+							potentialScore += tastes[happyColor] * (Math.pow(skittlesPerPlayer, 2));
+						}
+						else
+						{
+							potentialScore += tastes[happyColor] * skittlesPerPlayer;
+						}
+						skittlesEaten += skittlesPerPlayer;
+					}
+					else
+					{
+						if (tastes[happyColor] >= 0)
+						{
+							potentialScore += tastes[happyColor] * (Math.pow(totalSkittlesInMarket[happyColor], 2));
+						}
+						else
+						{
+							potentialScore += tastes[happyColor] * totalSkittlesInMarket[happyColor];
+						}
+						skittlesEaten += totalSkittlesInMarket[happyColor];
+					}
+				}
+				System.out.println("Player #" + plsTemp.getPlayerIndex() + "'s max score with hoarding is " + potentialScore);
+			}
+		}
+		if (nl)
+		{
+			System.out.println();
+			System.out.println("---------------------------------------------------");
+		}
+		
+/*		System.out.println( "------------------------------------------");
+		System.out.println( "******************************************\n" );*/
 	}
 
 	private boolean checkFinish()
@@ -438,7 +626,7 @@ public class Game
 				double dblHappinessUp = aplsPlayerStatus[ intPlayerIndex ].randEat( aintTempEat );
 				alEats.add( aintTempEat );
 				aplyPlayers[ intPlayerIndex ].happier( dblHappinessUp );
-				System.out.println( "Player #" + intPlayerIndex + ": You cannot eat these. Take them out of your mouth!" );
+//				System.out.println( "Player #" + intPlayerIndex + ": You cannot eat these. Take them out of your mouth!" );
 			}
 			// process offer
 			aplyPlayers[ intPlayerIndex ].offer( offTemp );
@@ -448,7 +636,7 @@ public class Game
 			}
 			else
 			{
-				System.out.println( "Player #" + intPlayerIndex + ": Invalid offer. Shame on you :)" );
+//				System.out.println( "Player #" + intPlayerIndex + ": Invalid offer. Shame on you :)" );
 				Offer offEmpty = new Offer( intPlayerIndex, intColorNum );
 				alCurrentOffers.add( offEmpty );
 			}
@@ -456,28 +644,40 @@ public class Game
 		aintCurrentEats = alEats.toArray( new int[ 0 ][] );
 		aoffCurrentOffers = alCurrentOffers.toArray( new Offer[ 0 ] );
 		
-		System.out.println( "******************************************" );
-		System.out.println( "------------------------------------------");
-		System.out.println( "Skittles consumption:" );
-		for ( int intPlayerIndex = 0; intPlayerIndex < intPlayerNum; intPlayerIndex ++ )
+/*		System.out.println( "******************************************" );
+		System.out.println( "------------------------------------------");*/
+		if (Stats.consumption)
 		{
-			System.out.print( "Player #" + intPlayerIndex + ": [ " );
-			String strInHand = "";
-			int[] aintInHand = alEats.get( intPlayerIndex );
-			for ( int intInHand : aintInHand )
+			System.out.println();
+			System.out.println( "Skittles consumption:" );
+			for ( int intPlayerIndex = 0; intPlayerIndex < intPlayerNum; intPlayerIndex ++ )
 			{
-				strInHand += intInHand + ", ";
+				if (Stats.playerFilter == -1 || Stats.playerFilter == intPlayerIndex)
+				{
+					System.out.print( "Player #" + intPlayerIndex + ": [ " );
+					String strInHand = "";
+					int[] aintInHand = alEats.get( intPlayerIndex );
+					for ( int intInHand : aintInHand )
+					{
+						strInHand += intInHand + ", ";
+					}
+					System.out.println( strInHand.substring( 0, strInHand.length() - 2 ) + " ]" );
+				}
 			}
-			System.out.println( strInHand.substring( 0, strInHand.length() - 2 ) + " ]" );
 		}
-		System.out.println();
-		System.out.println( "All offers:" );
-		for ( Offer offTemp : aoffCurrentOffers )
+		if (Stats.allOffers)
 		{
-			System.out.println( offTemp.toString() );
+			System.out.println( "All offers:" );
+			for ( Offer offTemp : aoffCurrentOffers )
+			{
+				if (Stats.playerFilter == -1 || (Stats.playerFilter == offTemp.getOfferedByIndex() || Stats.playerFilter == offTemp.getPickedByIndex()))
+				{
+					System.out.println( offTemp.toString() );
+				}
+			}
+			System.out.println( "------------------------------------------");
 		}
-		System.out.println( "------------------------------------------");
-		System.out.println( "******************************************\n" );
+//		System.out.println( "******************************************\n" );*/
 	}
 	
 	private int[] generateRandomOfferPickOrder()
@@ -489,15 +689,15 @@ public class Game
 		}
 		int[] aintOrder = new int[ intPlayerNum ];
 		Random rdmGenerator = new Random();
-		System.out.println( "Random order is:" );
+//		System.out.println( "Random order is:" );
 		for ( int intPlayerIndex = 0; intPlayerIndex < intPlayerNum; intPlayerIndex ++ )
 		{
 			int intRandom = rdmGenerator.nextInt( intPlayerNum - intPlayerIndex );
 			aintOrder[ intPlayerIndex ] = alPlayerIndices.get( intRandom );
 			alPlayerIndices.remove( intRandom );
-			System.out.print( aintOrder[ intPlayerIndex ] + " " );
+//			System.out.print( aintOrder[ intPlayerIndex ] + " " );
 		}
-		System.out.println( "\n" );
+//		System.out.println( "\n" );
 		return aintOrder;
 	}
 	
@@ -516,15 +716,15 @@ public class Game
 			{
 				if ( offPicked.getOfferLive() == false )
 				{
-					System.out.println( "Offer has been picked, forget about it" );
+//					System.out.println( "Offer has been picked, forget about it" );
 				}
 				else if ( !aplsPlayerStatus[ intPlayerIndex ].checkEnoughInHand( offPicked.getDesire() ) )
 				{
-					System.out.println( "Player #" + intPlayerIndex + ": you don't have enough skittles to accept this offer. Don't even think about it!" );
+//					System.out.println( "Player #" + intPlayerIndex + ": you don't have enough skittles to accept this offer. Don't even think about it!" );
 				}
 				else if ( intPlayerIndex == offPicked.getOfferedByIndex() )
 				{
-					System.out.println( "Trade with yourself? Schizophrenia..." );
+//					System.out.println( "Trade with yourself? Schizophrenia..." );
 				}
 				else
 				{
@@ -553,18 +753,27 @@ public class Game
 			aplyPlayers[ intPlayerIndex ].updateOfferExe( aoffCurrentOffers );
 		}
 		
-		System.out.println( "\n******************************************" );
+/*		System.out.println( "\n******************************************" );
 		System.out.println( "------------------------------------------");
-		System.out.println( "Offer execution: " );
-		for ( Offer offTemp : aoffCurrentOffers )
-		{
-			if ( offTemp.getPickedByIndex() != -1 )
+		System.out.println( "Offer execution: " );*/
+		
+			for ( Offer offTemp : aoffCurrentOffers )
 			{
-				System.out.println( offTemp.toString() );
+				if ( offTemp.getPickedByIndex() != -1 )
+				{
+					aplsPlayerStatus[offTemp.getOfferedByIndex()].updateCumulativeTrades(offTemp);
+					aplsPlayerStatus[offTemp.getPickedByIndex()].updateCumulativeTrades(offTemp);
+					if (Stats.allAcceptedTrades)
+					{
+						if (Stats.playerFilter == -1 || (Stats.playerFilter == offTemp.getOfferedByIndex() || Stats.playerFilter == offTemp.getPickedByIndex()))
+						{
+							System.out.println( offTemp.toString() );
+						}
+					}
+				}
 			}
-		}
-		System.out.println( "------------------------------------------");
-		System.out.println( "******************************************\n" );
+/*		System.out.println( "------------------------------------------");
+		System.out.println( "******************************************\n" );*/
 		
 	}
 	
@@ -577,5 +786,67 @@ public class Game
 		}
 		strReturn = strReturn.substring( 0, strReturn.length() - 2 ) + " ]";
 		return strReturn;
+	}
+	
+	private String intArrToString(int[] arr)
+	{
+		String str = "[";
+		
+		for (int i : arr)
+		{
+			str = str + i + " ";
+		}
+
+		str.trim();
+		str += "]";
+
+		return str;
+	}
+	
+	private int[] sortedHappyScore(double[] scores)
+	{
+		double[] sorted = scores.clone();
+		int[] indicies = new int[scores.length];
+		for (int i = 0; i < scores.length - 1; ++i)
+		{
+			int maxIndex = getMax(sorted, i);
+			indicies[i] = indexOf(sorted[maxIndex], scores);
+			swap(sorted, i, maxIndex);
+		}
+		return indicies;
+	}
+	
+	private int indexOf(double s, double[] scores)
+	{
+		for (int i = 0; i < scores.length; ++i)
+		{
+			if (scores[i] == s)
+			{
+				return i;
+			}
+		}
+		return -1;
+	}
+	
+	private void swap(double[] scores, int index1, int index2)
+	{
+		double temp = scores[index1];
+		scores[index1] = scores[index2];
+		scores[index2] = temp;
+	}
+	
+	private int getMax(double[] scores, int start)
+	{
+		int maxIndex = -1;
+		double maxVal = Double.NEGATIVE_INFINITY;
+		for (int i = start; i < scores.length; ++i)
+		{
+			if (scores[i] > maxVal)
+			{
+				maxVal = scores[i];
+				maxIndex = i;
+			}
+		}
+		return maxIndex;
 	}
 }
