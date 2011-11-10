@@ -175,7 +175,7 @@ public class TradeHistory {
 		}
 		}
 		if(numExchanged == 0){
-			if (DEBUG || true) {
+			if (DEBUG) {
 				System.out
 						.println("+_++++++++++++++++++++++*****************$$$$$$$$$$$$$$$$$$$$$@@@@@@@@@@@@@@@@@@@++++++++++++++++++_++++++++++++++++++++++*****************$$$$$$$$$$$$$$$$$$$$$@@@@@@@@@@@@@@@@@@@++++++++++++++++++_++++++++++++++++++++++*****************$$$$$$$$$$$$$$$$$$$$$@@@@@@@@@@@@@@@@@@@++++++++++++++++++_++++++++++++++++++++++*****************$$$$$$$$$$$$$$$$$$$$$@@@@@@@@@@@@@@@@@@@+++++++++++++++++");
 			}
@@ -208,7 +208,7 @@ public class TradeHistory {
 				Offer prevOffer = tradesOfferedByMe.get(tradesOfferedByMe.size() -1 );
 				if(!(prevOffer.getDesire()[wantColor.getColor()] == numExchanged && prevOffer.getOffer()[giveColor.getColor()] == numExchanged)){
 					currentOffer.setOffer(newBid, newAsk);
-					System.out.println();
+					//System.out.println("----------------------------------------------------------------------------------------------------------------------------------------------");
 				}else{
 					numExchanged = 0;
 				}

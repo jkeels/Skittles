@@ -237,6 +237,7 @@ public class Strategy {
 			int limit = gainList.indexOf(bag.getCandy(colorOracleWants));
 			int numTrading = tradeHistory.getTradeToGiveUpColor(me, bag, colorOracleWants, ask, limit);
 			bid[colorOracleWants] = numTrading;
+			temp.setOffer(bid, ask);
 		}else{
 			tradeHistory.getNextTradeOffer(me, temp, bag, market);	
 		}
