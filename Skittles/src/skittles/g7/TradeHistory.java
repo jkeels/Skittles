@@ -205,7 +205,7 @@ public class TradeHistory {
 			}
 		}
 		
-		/*if(numExchanged == 0){
+		if(numExchanged == 0){
 			List<Candy> gainList = bag.sortByGain();
 			int index = 1;
 			Candy getRidOf = gainList.get(bag.getNumColors() - index);
@@ -251,7 +251,7 @@ public class TradeHistory {
 					currentOffer.setOffer(newBid, colorsToGain);
 				 }
 			}
-		}*/
+		}
 	}
 	
 	
