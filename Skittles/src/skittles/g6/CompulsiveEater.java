@@ -65,7 +65,7 @@ public class CompulsiveEater extends Player
 
 		if(eatIndex == -1 || (!negativesRemain && turnsSinceLastTrade > pilesBelowSecondaryThreshold.size())){
 			
-			System.out.println("*************************** SELF DESTRUCT");
+			//System.out.println("*************************** SELF DESTRUCT");
 			for (int i = 0; i < aintInHand.length; i++) {
 				if(aintInHand[i] > 0){
 					aintTempEat[ i ] = aintInHand[ i ];
@@ -197,7 +197,7 @@ public class CompulsiveEater extends Player
 			tasteDiff *= 4.0;
 			double inventoryDiff = 3.0 * (aintInHand[target] - aintInHand[back]) / totalSkittles;
 			double liquidity = 1.0 * (aintInHand[target] - initialTargetInventory) / aintInHand[target]; 
-			System.out.println("taste diff: " + tasteDiff + "inv diff: " + inventoryDiff + "liquidity: " +liquidity);
+			//System.out.println("taste diff: " + tasteDiff + "inv diff: " + inventoryDiff + "liquidity: " +liquidity);
 			if(tasteDiff - inventoryDiff - liquidity > .15){
 				target = back;
 				initialTargetInventory = piles.get(discoveryIndex).getFront();
@@ -358,11 +358,11 @@ public class CompulsiveEater extends Player
 	}
 	
 	public void printInHand(){
-		System.out.print("InHand: ");
+		/*System.out.print("InHand: ");
 		for (int i = 0; i < aintInHand.length; i++) {
 			System.out.print(aintInHand[i] + " ");
 		}
-		System.out.println();
+		System.out.println();*/
 	}
 
 	@Override

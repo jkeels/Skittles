@@ -71,7 +71,7 @@ public class Strategy {
 	public boolean eatingOracle(int colorIndex){
 		List<Offer> ll = tradeHistory.getTradesOfferedByMe();
 		boolean offeredBefore = false;
-		for(int i = ll.size() - 1; i > ll.size() - 4 && i > 0; --i){
+		for(int i = ll.size() - 1; i > ll.size() - 3 && i > 0; --i){
 			Offer off = ll.get(i);
 			if (off.getOffer()[colorIndex] > 0) {
 				offeredBefore = true;

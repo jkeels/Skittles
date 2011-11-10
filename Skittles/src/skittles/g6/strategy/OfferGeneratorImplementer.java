@@ -61,9 +61,9 @@ public class OfferGeneratorImplementer implements OfferGenerator{
 		else{
 			newOffer = getHoardingOffer();
 			
-			System.out.println(myCompulsiveEater.getTarget());
-			System.out.println("^^^^^^^^");
-			System.out.println(newOffer);
+			//System.out.println(myCompulsiveEater.getTarget());
+			//System.out.println("^^^^^^^^");
+			//System.out.println(newOffer);
 			
 		}
 		/*if (isOfferCold(newOffer)){
@@ -245,7 +245,7 @@ public class OfferGeneratorImplementer implements OfferGenerator{
 				}
 				
 				stopRecursiveInfiniteLoop--;
-				System.out.println("TRY NEW COLOR");
+				//System.out.println("TRY NEW COLOR");
 				return getHoardingOffer();
 			}
 		}
@@ -262,11 +262,11 @@ public class OfferGeneratorImplementer implements OfferGenerator{
 			
 			int netChange = prevInventory - myCompulsiveEater.getAIntInHand()[tradeAway];
 		
-			System.out.println("NET CHANGE: " + netChange);
+			//System.out.println("NET CHANGE: " + netChange);
 			
 			if (prevInventory!=-1 && netChange < lastAmount) {
-				System.out.println("RETRY COLOR");
-				System.out.println("TURN COUNTER: " + turnCounter);
+				//System.out.println("RETRY COLOR");
+				//System.out.println("TURN COUNTER: " + turnCounter);
 				amount = Math.max(lastAmount / 2, 1);
 			} else {
 				if (netChange==0 && myCompulsiveEater.getPilesBelowSecondaryThreshold().size()!=0) {
@@ -290,7 +290,7 @@ public class OfferGeneratorImplementer implements OfferGenerator{
 						return getHoardingOffer();
 				}
 				
-				System.out.println("OFFER WENT THROUGH");
+				//System.out.println("OFFER WENT THROUGH");
 				turnCounter = 0;
 				amount = Math.min(Math.max(lastAmount*3/2, lastAmount+1), myCompulsiveEater.getAIntInHand()[tradeAway]);
 			}
