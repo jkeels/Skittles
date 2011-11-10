@@ -80,6 +80,8 @@ public class Eater {
 		Util.print(info.preference);
 		Util.print(eating);
 		Util.print(info.hand);
-		System.out.println(whichColor + " " + howMany);
+		if (false) {
+			System.out.println(whichColor + " " + howMany);
+		}
 	}
 }

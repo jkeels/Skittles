@@ -105,15 +105,19 @@ public class Util {
 		double values[] = new double[] { 1, 2, 3, 4, 5 };
 		int[] ranks = index(values);
 		print(values);
+		if(false){
 		for (int i = 0; i < ranks.length; i++)
 			System.out.print(values[ranks[i]] + " ");
+		}
 	}
 
 	public static void print(double[] val) {
+		if(false)
 		System.out.println(toString(val));
 	}
 
 	public static void print(int[] val) {
+		if(false)
 		System.out.println(toString(val));
 	}
 }
