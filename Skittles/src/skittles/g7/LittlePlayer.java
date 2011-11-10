@@ -48,7 +48,7 @@ public class LittlePlayer extends Player {
 	}
 
 	@Override
-	public void initialize(int numPlayers, int myId, String myClassName, int[] skittlesInHand) {
+	public void initialize(int numPlayers, double wtfShen, int myId, String myClassName, int[] skittlesInHand) {
 		this.myId = myId;
 		this.myClassName = myClassName;
 		strategy = new Strategy(myId, numPlayers, new CandyBag(skittlesInHand));

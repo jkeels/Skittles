@@ -61,7 +61,7 @@ public class Candy implements Comparable<Candy>{
 	public int compareTo(Candy c) {
 		if (this.value() < c.value())
 			return 1;
-		if (this.value() == c.value())
+		if (this.value().intValue() == c.value().intValue())
 			return 0;
 		return -1;
 	}

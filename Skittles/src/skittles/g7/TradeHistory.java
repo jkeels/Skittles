@@ -181,27 +181,27 @@ public class TradeHistory {
 			List<Candy> gainList = bag.sortByGain();
 			int index = 1;
 			Candy wantColor = prefList.get(prefList.size() - index);
-			while(wantColor.equals(gainList.get(index-1))){
-				++index;
-				try {
+			try {
+				while (wantColor.equals(gainList.get(index - 1))) {
+					++index;
 					wantColor = prefList.get(prefList.size() - index);
-				} catch (IndexOutOfBoundsException e) {
-					// TODO Auto-generated catch block
-					wantColor = null;
 				}
+			} catch (IndexOutOfBoundsException e) {
+				wantColor = null;
 			}
 			boolean skip = false;
 			if(wantColor == null || wantColor.getPref() <= 0){
 				skip = true;
 			}
 			if (!skip) {
-				Candy giveColor = prefList.get(prefList.size() - index - 1);
+				Candy giveColor = gainList.get(index - 1);
 				numExchanged = bag.switchThreshhold(giveColor, wantColor);
 				int[] newBid = new int[bag.getNumColors()];
 				int[] newAsk = new int[bag.getNumColors()];
 				newBid[giveColor.getColor()] = numExchanged;
 				newAsk[wantColor.getColor()] = numExchanged;
 				currentOffer.setOffer(newBid, newAsk);
+				System.out.println();
 			}
 		}
 		
