@@ -24,10 +24,12 @@ public class Strategy {
 	private int numCandiesEatenOnLastTurn;
 	private int colorEatenOnLastTurn;
 	private int numColorsToHoard;
+	private int colorOracleWants;
 
 	private double currentHappiness = 0;
 
 	private boolean tasting = false;
+	private boolean oracleWantsToTrade = false;
 
 	public Strategy(int myID, int numPlayers, CandyBag bag) {
 		this.numPlayers = numPlayers;
@@ -144,8 +146,9 @@ public class Strategy {
 				// Use the oracle here to determine whether or not to eat one or
 				// eat all. If the oracle returns true, we eat one. Else we eat
 				// all.
-				boolean oracle = eatingOracle(colorEatenOnLastTurn);
-				if (oracle) {
+				oracleWantsToTrade = eatingOracle(colorEatenOnLastTurn);
+				if (oracleWantsToTrade) {
+					colorOracleWants = colorEatenOnLastTurn;
 					numCandiesEatenOnLastTurn = 1;
 				} else {
 					numCandiesEatenOnLastTurn = bag.getCandy(
@@ -204,8 +207,9 @@ public class Strategy {
 				numCandiesEatenOnLastTurn = bag.getCandy(colorEatenOnLastTurn)
 						.getRemaining();
 			} else {
-				boolean oracle = eatingOracle(colorEatenOnLastTurn);
-				if (oracle) {
+				oracleWantsToTrade = eatingOracle(colorEatenOnLastTurn);
+				if (oracleWantsToTrade) {
+					colorOracleWants = colorEatenOnLastTurn;
 					numCandiesEatenOnLastTurn = 1;
 				} else {
 					numCandiesEatenOnLastTurn = bag.getCandy(
@@ -225,7 +229,17 @@ public class Strategy {
 	}
 	
 	public void getNextTradeOffer(Player me, Offer temp){
-		tradeHistory.getNextTradeOffer(me, temp, bag, market);	
+		if(oracleWantsToTrade){
+			oracleWantsToTrade = false;
+			int[] ask = new int[bag.getNumColors()];
+			int[] bid = new int[bag.getNumColors()];
+			List<Candy> gainList = bag.sortByGain();
+			int limit = gainList.indexOf(bag.getCandy(colorOracleWants));
+			int numTrading = tradeHistory.getTradeToGiveUpColor(me, bag, colorOracleWants, ask, limit);
+			bid[colorOracleWants] = numTrading;
+		}else{
+			tradeHistory.getNextTradeOffer(me, temp, bag, market);	
+		}
 	}
 
 	public void offerExecuted(Offer offPicked) {
