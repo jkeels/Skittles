@@ -2,7 +2,11 @@
 <GameConfig>
 	<Game>
 		<ColorNum>5</ColorNum>
+<<<<<<< HEAD
 		<SkittleNum>1000</SkittleNum>
+=======
+		<SkittleNum>100</SkittleNum>
+>>>>>>> 3bc2eb8bbadb539653adcc299352aec63559f73b
 	</Game>
 	<Player>
 		<Class>skittles.g7.LittlePlayer</Class>
@@ -10,6 +14,7 @@
 		<InHand>random</InHand>
 	</Player>
 	<Player>
+<<<<<<< HEAD
 		<Class>skittles.g1player.G1Player</Class>
 		<Happiness>random,0.5</Happiness>
 		<InHand>random</InHand>
@@ -42,6 +47,10 @@
 	<Player>
 		<Class>skittles.g7.G7Player</Class>
 		<Happiness>random,0.5</Happiness>
+=======
+		<Class>skittles.g7.G7Player</Class>
+		<Happiness>random,5</Happiness>
+>>>>>>> 3bc2eb8bbadb539653adcc299352aec63559f73b
 		<InHand>random</InHand>
 	</Player>
 	<Player>

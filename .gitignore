@@ -2,3 +2,8 @@ bin/
 GameConfig.*
 p*.txt
 P*.txt
+<<<<<<< HEAD
+=======
+.gitignore
+Skittles/GameConfig.*
+>>>>>>> 3bc2eb8bbadb539653adcc299352aec63559f73b
