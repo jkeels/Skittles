@@ -28,7 +28,7 @@ public class TradeHistory {
 	private static final int STEP = 2;
 	private static final int OFFER_SIZE = 5;
 	private static Random random = new Random();
-	private static final boolean DEBUG = true;
+	private static final boolean DEBUG = false;
 	private int[][] liquidity;
 	
 	
@@ -195,7 +195,7 @@ public class TradeHistory {
 				skip = true;
 			}
 			if (!skip) {
-				Candy giveColor = prefList.get(index - 1);
+				Candy giveColor = prefList.get(prefList.size() - index - 1);
 				numExchanged = bag.switchThreshhold(giveColor, wantColor);
 				int[] newBid = new int[bag.getNumColors()];
 				int[] newAsk = new int[bag.getNumColors()];
@@ -205,7 +205,7 @@ public class TradeHistory {
 			}
 		}
 		
-		if(numExchanged == 0){
+		/*if(numExchanged == 0){
 			List<Candy> gainList = bag.sortByGain();
 			int index = 1;
 			Candy getRidOf = gainList.get(bag.getNumColors() - index);
@@ -224,7 +224,7 @@ public class TradeHistory {
 			if(!skip){
 				 for(int player = 0; player < liquidity.)
 			}
-		}
+		}*/
 	}
 	
 	
