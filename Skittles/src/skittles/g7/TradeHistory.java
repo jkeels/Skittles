@@ -80,7 +80,7 @@ public class TradeHistory {
 				min = liquidity[player][color];
 				prospectivePartner = player;
 				for(int c = 0; c < liquidity[player].length; c++){
-					if(c != color && liquidity[player][c] < 0){
+					if(c != color && liquidity[player][c] < 0 && bag.getCandy(c).isTasted()){
 						int toGiveUp = -liquidity[player][c];
 						if(bag.getCandy(c).getRemaining() >= toGiveUp ){
 							colorsToGiveUp[c] = toGiveUp;
