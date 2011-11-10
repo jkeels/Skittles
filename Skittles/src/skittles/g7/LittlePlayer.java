@@ -17,6 +17,7 @@ public class LittlePlayer extends Player {
 	@Override
 	public void offer(Offer offTemp) {
 		strategy.getNextTradeOffer(this, offTemp);
+		System.out.println();
 	}
 
 	@Override

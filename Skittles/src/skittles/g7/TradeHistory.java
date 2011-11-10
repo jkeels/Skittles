@@ -141,6 +141,7 @@ public class TradeHistory {
 		
 		if(gain > 0){
 			currentOffer.setOffer(colorsToGiveUp, tempAsk);
+			return;
 		}else{
 			
 		double highestFavColorValue = -1;
@@ -169,8 +170,9 @@ public class TradeHistory {
 			ask[fav] = numExchanged;
 
 		}
-		
-		currentOffer.setOffer(bid, ask);
+		if(numExchanged > 0){
+			currentOffer.setOffer(bid, ask);
+		}
 		}
 		if(numExchanged == 0){
 			if (DEBUG || true) {
@@ -179,6 +181,9 @@ public class TradeHistory {
 			}
 			List<Candy> prefList = bag.sortByPreference();
 			List<Candy> gainList = bag.sortByGain();
+			if(gainList.get(2).getRemaining() == 0){
+				System.out.println();
+			}
 			int index = 1;
 			Candy wantColor = prefList.get(prefList.size() - index);
 			try {
@@ -190,11 +195,11 @@ public class TradeHistory {
 				wantColor = null;
 			}
 			boolean skip = false;
-			if(wantColor == null || wantColor.getPref() <= 0){
+			Candy giveColor = index > gainList.size() ? null : gainList.get(index - 1);
+			if(wantColor == null || wantColor.getPref() <= 0 || (wantColor.getRemaining() == 0 && giveColor.getPref() >= 0) || giveColor == null){
 				skip = true;
 			}
 			if (!skip) {
-				Candy giveColor = gainList.get(index - 1);
 				numExchanged = bag.switchThreshhold(giveColor, wantColor);
 				int[] newBid = new int[bag.getNumColors()];
 				int[] newAsk = new int[bag.getNumColors()];
@@ -249,6 +254,13 @@ public class TradeHistory {
 					int[] newBid = new int[bag.getNumColors()];
 					newBid[color] = numExchanged;
 					currentOffer.setOffer(newBid, colorsToGain);
+				 } else {
+					 numExchanged = (int)getRidOf.getRemaining()/2;
+					 int[] newBid = new int[bag.getNumColors()];
+					 int[] newAsk = new int[bag.getNumColors()];
+					 newBid[getRidOf.getColor()] = numExchanged;
+					 newAsk[gainList.get(0).getColor()] = numExchanged;
+					 currentOffer.setOffer(newBid, newAsk);
 				 }
 			}
 		}
