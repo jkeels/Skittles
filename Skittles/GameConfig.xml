@@ -7,27 +7,47 @@
 
 	<Player>
 		<Class>skittles.g7.LittlePlayer</Class>
-		<Happiness>random,0.01</Happiness>
-		<InHand>random</InHand>
-	</Player>
-	<Player>
-		<Class>skittles.g7.G7Player</Class>
-		<Happiness>random,0.01</Happiness>
+		<Happiness>random,0.5</Happiness>
 		<InHand>random</InHand>
 	</Player>
 	<Player>
 		<Class>skittles.g1player.G1Player</Class>
-		<Happiness>random,0.01</Happiness>
+		<Happiness>random,0.5</Happiness>
+		<InHand>random</InHand>
+	</Player>
+	<Player>
+		<Class>skittles.g2.Ebenezer</Class>
+		<Happiness>random,0.5</Happiness>
 		<InHand>random</InHand>
 	</Player>
 	<Player>
 		<Class>skittles.g3.G3Player</Class>
-		<Happiness>random,0.01</Happiness>
+		<Happiness>random,0.5</Happiness>
+		<InHand>random</InHand>
+	</Player>
+	<Player>
+		<Class>skittles.g4FatKid.G4FatKid</Class>
+		<Happiness>random,0.5</Happiness>
+		<InHand>random</InHand>
+	</Player>
+	<Player>
+		<Class>skittles.g5.FatKidPositive</Class>
+		<Happiness>random,0.5</Happiness>
+		<InHand>random</InHand>
+	</Player>
+	<Player>
+		<Class>skittles.g6.CompulsiveEater</Class>
+		<Happiness>random,0.5</Happiness>
+		<InHand>random</InHand>
+	</Player>
+	<Player>
+		<Class>skittles.g7.G7Player</Class>
+		<Happiness>random,0.5</Happiness>
 		<InHand>random</InHand>
 	</Player>
 	<Player>
 		<Class>skittles.dumpplayer.DumpPlayer</Class>
-		<Happiness>random,0.01</Happiness>
+		<Happiness>random,0.5</Happiness>
 		<InHand>random</InHand>
 	</Player>
 </GameConfig>

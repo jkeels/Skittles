@@ -24,7 +24,7 @@ public class G4FatKid extends Player {
 	private int streakOfNoTrades;
 
 	// set verbose to false to suppress output of debug statements
-	boolean verbose = true;
+	boolean verbose = false;
 	boolean desiredResult = false;
 	// PlayerProfiles tracks net changes to all players
 	private PlayerProfiles opponentProfiles;

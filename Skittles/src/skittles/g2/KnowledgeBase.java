@@ -344,8 +344,11 @@ public class KnowledgeBase {
 	}
 	
 	public void printEstimateCount() {
-		for (int i = 0; i < estimatedCount.length; i++) {
-			System.out.println("Player " + i + " estimate: " + aToS(estimatedCount[i]));
+		if (false) {
+			for (int i = 0; i < estimatedCount.length; i++) {
+				System.out.println("Player " + i + " estimate: "
+						+ aToS(estimatedCount[i]));
+			}
 		}
 	}
 	

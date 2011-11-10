@@ -201,7 +201,13 @@ public class Strategy {
 				numCandiesEatenOnLastTurn = bag.getCandy(colorEatenOnLastTurn)
 						.getRemaining();
 			} else {
-				numCandiesEatenOnLastTurn = 1;
+				boolean oracle = eatingOracle(colorEatenOnLastTurn);
+				if (oracle) {
+					numCandiesEatenOnLastTurn = 1;
+				} else {
+					numCandiesEatenOnLastTurn = bag.getCandy(
+							colorEatenOnLastTurn).getRemaining();
+				}
 			}
 		}
 
