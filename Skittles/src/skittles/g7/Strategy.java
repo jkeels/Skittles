@@ -29,11 +29,11 @@ public class Strategy {
 
 	private boolean tasting = false;
 
-	public Strategy(int numPlayers, CandyBag bag) {
+	public Strategy(int myID, int numPlayers, CandyBag bag) {
 		this.numPlayers = numPlayers;
 		// friends = new ArrayList<Friend>(numPlayers);
 		this.bag = bag;
-		tradeHistory = new TradeHistory();
+		tradeHistory = new TradeHistory(myID, numPlayers, bag.getNumColors());
 		market = new MarketKnowledge[numPlayers];
 		for (int i = 0; i < numPlayers; i++) {
 			market[i] = new MarketKnowledge(bag.getNumColors());
@@ -220,45 +220,9 @@ public class Strategy {
 		}
 		bag.removeCandy(colorEatenOnLastTurn, numCandiesEatenOnLastTurn);
 	}
-
-	public void getNextTradeOffer(Offer temp) {
-
-		int numExchanged = random.nextInt(5) + 1;
-		int numColors = bag.getNumColors();
-		List<Candy> candies = bag.sortByGain();
-		int[] bid = new int[numColors];
-		int[] ask = new int[numColors];
-
-		int fav = candies.get(0).getColor();
-
-		double highestFavColorValue = -1;
-		int highestFavColorIndex = -1;
-		for (MarketKnowledge mk : market) {
-			for (int i = 0; i < numColors; i++) {
-				// retrieves the highest color value and makes sure its not our
-				// favorite color
-				if (mk.getColorInfo(i) > highestFavColorValue && i != fav) {
-					highestFavColorValue = mk.getColorInfo(i);
-					highestFavColorIndex = i;
-				}
-			}
-
-			if (DEBUG) {
-				System.out.println("highest color value: "
-						+ highestFavColorValue + " with index:"
-						+ highestFavColorIndex);
-			}
-		}
-
-		if (highestFavColorValue != -1) {
-			while (bag.getCandy(highestFavColorIndex).getRemaining() < numExchanged)
-				numExchanged--;
-			bid[highestFavColorIndex] = numExchanged;
-			ask[fav] = numExchanged;
-
-		}
-
-		temp.setOffer(bid, ask);
+	
+	public void getNextTradeOffer(Player me, Offer temp){
+		tradeHistory.getNextTradeOffer(me, temp, bag, market);	
 	}
 
 	public void offerExecuted(Offer offPicked) {
@@ -293,10 +257,7 @@ public class Strategy {
 			}
 			
 			
-			if(off.getOfferedByIndex() == me.getPlayerIndex()){
-				tradeHistory.recordTradeOfferedByMe(off);
-			}
-				
+			tradeHistory.recordTradeOffered(me, off);
 			
 		}
 

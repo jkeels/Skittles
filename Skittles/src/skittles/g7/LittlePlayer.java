@@ -16,7 +16,7 @@ public class LittlePlayer extends Player {
 
 	@Override
 	public void offer(Offer offTemp) {
-		strategy.getNextTradeOffer(offTemp);
+		strategy.getNextTradeOffer(this, offTemp);
 	}
 
 	@Override
@@ -51,7 +51,7 @@ public class LittlePlayer extends Player {
 	public void initialize(int numPlayers, int myId, String myClassName, int[] skittlesInHand) {
 		this.myId = myId;
 		this.myClassName = myClassName;
-		strategy = new Strategy(numPlayers, new CandyBag(skittlesInHand));
+		strategy = new Strategy(myId, numPlayers, new CandyBag(skittlesInHand));
 	}
 
 	@Override
