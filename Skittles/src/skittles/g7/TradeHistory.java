@@ -227,31 +227,11 @@ public class TradeHistory {
 				skip = true;
 			}
 			if(!skip){
-				 int min = 0;
-				 int prospectivePartner = -1;
 				 int color = getRidOf.getColor();
 				 int [] colorsToGain = new int[numColors];
 				 int toGain = 0;
-				 
-				 for(int player = 0; player < liquidity.length; player++){
-						if(player != me.getPlayerIndex() && -liquidity[player][color] > min){
-							min = -liquidity[player][color];
-							prospectivePartner = player;
-						}
-					}
-				 
-				 
-				 if(min != 0){
-					 	toGain = 0;
-						for(int c = 0; c < liquidity[prospectivePartner].length; c++){
-							if(c != color && liquidity[prospectivePartner][c] > 0 &&
-										goodToTrade(gainList, bag, color, bag.getNumColors() - index)){
-								colorsToGain[c] = liquidity[prospectivePartner][c];
-								toGain += colorsToGain[c];
-							}
-						}
-					numExchanged = min > toGain ? toGain : min;
-					int[] newBid = new int[bag.getNumColors()];
+				 numExchanged = getTradeToGiveUpColor(me, bag, color, colorsToGain, bag.getNumColors() - index);
+				 int[] newBid = new int[bag.getNumColors()];
 					newBid[color] = numExchanged;
 					currentOffer.setOffer(newBid, colorsToGain);
 				 } else {
@@ -261,7 +241,7 @@ public class TradeHistory {
 					 newBid[getRidOf.getColor()] = numExchanged;
 					 newAsk[gainList.get(0).getColor()] = numExchanged;
 					 currentOffer.setOffer(newBid, newAsk);
-				 }
+				 
 			}
 		}
 	}
@@ -275,5 +255,33 @@ public class TradeHistory {
 		if(i < limit) return true;
 		return false;
 	}
+	
+	private int getTradeToGiveUpColor(Player me, CandyBag bag, int color, int[] colorsToGain, int limit){
+		int min = 0;
+		int prospectivePartner = -1;
+		int toGain = 0; 
+		int numExchanged = 0;
+		
+		for(int player = 0; player < liquidity.length; player++){
+			if(player != me.getPlayerIndex() && -liquidity[player][color] > min){
+				min = -liquidity[player][color];
+				prospectivePartner = player;
+			}
+		}
+	 
+	 
+		if(min != 0){
+		 	toGain = 0;
+			for(int c = 0; c < liquidity[prospectivePartner].length; c++){
+				if(c != color && liquidity[prospectivePartner][c] > 0 &&
+							goodToTrade(bag.sortByGain(), bag, color, limit)){
+					colorsToGain[c] = liquidity[prospectivePartner][c];
+					toGain += colorsToGain[c];
+				}
+			}
+			numExchanged = min > toGain ? toGain : min;
+		}
+		return numExchanged;
+		}
 
 }
