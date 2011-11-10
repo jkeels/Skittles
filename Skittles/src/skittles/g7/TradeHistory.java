@@ -226,22 +226,23 @@ public class TradeHistory {
 			if(getRidOf == null){
 				skip = true;
 			}
-			if(!skip){
-				 int color = getRidOf.getColor();
-				 int [] colorsToGain = new int[numColors];
-				 int toGain = 0;
-				 numExchanged = getTradeToGiveUpColor(me, bag, color, colorsToGain, bag.getNumColors() - index);
-				 int[] newBid = new int[bag.getNumColors()];
+			if (!skip) {
+				int color = getRidOf.getColor();
+				int[] colorsToGain = new int[numColors];
+				int toGain = 0;
+				numExchanged = getTradeToGiveUpColor(me, bag, color, colorsToGain, bag.getNumColors() - index);
+				if (numExchanged != 0) {
+					int[] newBid = new int[bag.getNumColors()];
 					newBid[color] = numExchanged;
 					currentOffer.setOffer(newBid, colorsToGain);
-				 } else {
-					 numExchanged = (int)getRidOf.getRemaining()/2;
-					 int[] newBid = new int[bag.getNumColors()];
-					 int[] newAsk = new int[bag.getNumColors()];
-					 newBid[getRidOf.getColor()] = numExchanged;
-					 newAsk[gainList.get(0).getColor()] = numExchanged;
-					 currentOffer.setOffer(newBid, newAsk);
-				 
+				} else {
+					numExchanged = (int) getRidOf.getRemaining() / 2;
+					int[] newBid = new int[bag.getNumColors()];
+					int[] newAsk = new int[bag.getNumColors()];
+					newBid[getRidOf.getColor()] = numExchanged;
+					newAsk[gainList.get(0).getColor()] = numExchanged;
+					currentOffer.setOffer(newBid, newAsk);
+				}
 			}
 		}
 	}
@@ -256,7 +257,7 @@ public class TradeHistory {
 		return false;
 	}
 	
-	private int getTradeToGiveUpColor(Player me, CandyBag bag, int color, int[] colorsToGain, int limit){
+	public int getTradeToGiveUpColor(Player me, CandyBag bag, int color, int[] colorsToGain, int limit){
 		int min = 0;
 		int prospectivePartner = -1;
 		int toGain = 0; 
