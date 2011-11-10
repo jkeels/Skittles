@@ -62,7 +62,7 @@ public class TradeHistory {
 			int[] bid = offer.getOffer();
 			int[] ask = offer.getDesire();
 			for(int color = 0; color < bid.length; color++){
-				if(bid[color] != 0 || ask[color] != 0 )
+				//if(bid[color] != 0 || ask[color] != 0 )
 						liquidity[player][color] = bid[color] - ask[color];
 			}
 		}
@@ -81,7 +81,13 @@ public class TradeHistory {
 				prospectivePartner = player;
 				for(int c = 0; c < liquidity[player].length; c++){
 					if(c != color && liquidity[player][c] < 0){
-						colorsToGiveUp[c] = -liquidity[player][c];
+						int toGiveUp = -liquidity[player][c];
+						if(bag.getCandy(c).getRemaining() >= toGiveUp ){
+							colorsToGiveUp[c] = toGiveUp;
+						}else{
+							colorsToGiveUp[c] = bag.getCandy(c).getRemaining();
+						}
+						
 					}
 				}
 			}
