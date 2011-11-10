@@ -277,7 +277,7 @@ public class Strategy {
 				continue;
 			int[] currentDesire = offTemp.getDesire();
 			// int[] currentOffer = offTemp.getOffer();
-			double currentPotentialScore = checkOffer(offTemp);
+			double currentPotentialScore = checkOffer(bag, offTemp);
 			// Check to see if we have enough to even go through with this trade
 			// before we deliberate
 			if (checkEnoughInHand(currentDesire)) {
@@ -306,7 +306,7 @@ public class Strategy {
 		return offReturn;
 	}
 
-	public double checkOffer(Offer offer) {
+	public static double checkOffer(CandyBag bag, Offer offer) {
 
 		double differenceInScore = 0;
 		int[] tempDesire = offer.getDesire();
