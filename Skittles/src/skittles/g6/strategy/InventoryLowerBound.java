@@ -6,5 +6,6 @@ import skittles.sim.Offer;
 public interface InventoryLowerBound {
 	public void setPlayer(CompulsiveEater player);
 	public void setCurrentOffers(Offer[] offers);
-	public void queryLowerBound(int playerId, int color);
+	public void decay();
+	public int queryLowerBound(int playerId, int color);
 }

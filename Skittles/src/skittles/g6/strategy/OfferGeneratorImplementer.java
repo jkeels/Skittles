@@ -20,7 +20,13 @@ public class OfferGeneratorImplementer implements OfferGenerator{
 	private int initialInventory = 0;
 	private int pileIterator = 0;
 	
+	private int prevInventory = -1;
+	
+	private int stopRecursiveInfiniteLoop = 10;
+	
 	private boolean alternativeMode = false;
+	
+	private PreferenceEvaluator pref;
 	
 	public OfferGeneratorImplementer(){
 		offersHistory = new ArrayList<Offer[]>();
@@ -35,6 +41,7 @@ public class OfferGeneratorImplementer implements OfferGenerator{
 	
 	public void setPlayer(CompulsiveEater player) {
 		myCompulsiveEater = player;
+		pref = player.getPreferenceEavluator();
 	}
 
 	public void setCurrentOffers(Offer[] offers) {
@@ -53,6 +60,11 @@ public class OfferGeneratorImplementer implements OfferGenerator{
 		}
 		else{
 			newOffer = getHoardingOffer();
+			
+			System.out.println(myCompulsiveEater.getTarget());
+			System.out.println("^^^^^^^^");
+			System.out.println(newOffer);
+			
 		}
 		/*if (isOfferCold(newOffer)){
 			//generateNewOffer
@@ -91,25 +103,21 @@ public class OfferGeneratorImplementer implements OfferGenerator{
 	 * @param anOffer
 	 * @return
 	 */
+	
 	// TODO: check for null offers
-	/*public boolean isOfferCold(Offer anOffer){
+
+/*	public boolean isOfferCold(Offer anOffer){
 		int myPlayerIndex = myCompulsiveEater.getPlayerIndex();
-		int turn = myCompulsiveEater.getTurnCounter();
 		if (turn > 1){
-			if ( compareOffers(offersHistory.get(turn-1)[myPlayerIndex], anOffer)
-					&& compareOffers(offersHistory.get(turn-2)[myPlayerIndex], anOffer) ){
+			if ( compareOffers(offersHistory.get(turn)[myPlayerIndex], anOffer)
+					|| compareOffers(offersHistory.get(turn-1)[myPlayerIndex], anOffer) ){
 				return true;
 			}
 		}
 		return false;
 	}*/
-/*	*//**
-	 * @author, Jonathan
-	 * @param offer1
-	 * @param offer2
-	 * @return
-	 *//*
-	public boolean compareOffers(Offer offer1, Offer offer2){
+	
+	/*public boolean compareOffers(Offer offer1, Offer offer2){
 		for (int i=0; i<intColorNum; i++){
 			if (offer1.getOffer()[i] != offer2.getOffer()[i])
 				return false;
@@ -134,11 +142,82 @@ public class OfferGeneratorImplementer implements OfferGenerator{
 					colorOfIt = i;
 				}
 			}
+			
+			//alternative mode is when no piles are under secondary threshold, and we're trading away
+			//   the smallest pile
 			alternativeMode = true;
 			tradeAway = colorOfIt;
 		} else {
 			alternativeMode = false;
-			tradeAway = myCompulsiveEater.getPilesBelowSecondaryThreshold().get(pileIterator).getBack();
+			
+			int targetPlayer = -1;
+			int tradeAwayToPlayer = -1;
+			
+			for (int i = 0; i< myCompulsiveEater.getPlayerNum(); i++) {
+				if (i==myCompulsiveEater.getPlayerIndex()) continue;
+				
+				tradeAwayToPlayer = -1;
+				
+				int[] curPref = pref.getColorsSortedFromPlayer(i);
+				
+				int checkRange = Math.max(1, intColorNum/4);
+				
+				boolean weHaveWhatTheyWant = false;
+				
+				for (int j = 0; j < checkRange; j++) {
+					int curColor = curPref[j];
+					for (Pair<Integer, Integer> pair : myCompulsiveEater.getPilesBelowSecondaryThreshold()) {
+						if (pair.getBack() == curColor) {
+							weHaveWhatTheyWant = true;
+							tradeAwayToPlayer = curColor;
+							break;
+						}
+					}
+				}
+				
+				boolean theyHaveWhatWeWant = false;
+				
+				for (int j = 0; j < checkRange; j++) {
+					
+					if (curPref[intColorNum-1-j]==target) {
+						theyHaveWhatWeWant = true;
+						break;
+					}
+				}
+				
+				if (weHaveWhatTheyWant && theyHaveWhatWeWant) {
+					targetPlayer = i;
+					break;
+				}
+			}
+			
+			if (targetPlayer != -1) {
+				tradeAway = tradeAwayToPlayer;
+			} else {
+				tradeAway = myCompulsiveEater.getPilesBelowSecondaryThreshold().get(pileIterator).getBack();
+			}
+		}
+		
+		//tradeAway can't be target
+		if (tradeAway == target) {
+			turnCounter++;
+			pileIterator = (pileIterator + 1) % myCompulsiveEater.getPilesBelowSecondaryThreshold().size();
+				if (stopRecursiveInfiniteLoop==0) {
+					int[] offered = new int[intColorNum];
+					int[] desired = new int[intColorNum];
+					
+					for (int i = 0; i < intColorNum; i++) {
+						offered[i]=0;
+						desired[i]=0;
+					}
+					
+					Offer o = new Offer(myCompulsiveEater.getPlayerIndex(), intColorNum);
+					o.setOffer(offered, desired);
+					return o;
+				}
+				
+				stopRecursiveInfiniteLoop--;
+				return getHoardingOffer();
 		}
 		
 		if (lastTradeAway!=tradeAway) {
@@ -149,20 +228,76 @@ public class OfferGeneratorImplementer implements OfferGenerator{
 			turnCounter++;
 			
 			if (turnCounter>=Parameters.GIVE_UP_TURNS &&
-					myCompulsiveEater.getAIntInHand()[tradeAway] - initialInventory < Parameters.GIVE_UP_TURNS + 1) {
+					initialInventory - myCompulsiveEater.getAIntInHand()[tradeAway] < Parameters.GIVE_UP_TURNS + 1) {
 				pileIterator = (pileIterator + 1) % myCompulsiveEater.getPilesBelowSecondaryThreshold().size();
+				if (stopRecursiveInfiniteLoop==0) {
+					int[] offered = new int[intColorNum];
+					int[] desired = new int[intColorNum];
+					
+					for (int i = 0; i < intColorNum; i++) {
+						offered[i]=0;
+						desired[i]=0;
+					}
+					
+					Offer o = new Offer(myCompulsiveEater.getPlayerIndex(), intColorNum);
+					o.setOffer(offered, desired);
+					return o;
+				}
+				
+				stopRecursiveInfiniteLoop--;
+				System.out.println("TRY NEW COLOR");
 				return getHoardingOffer();
 			}
 		}
 		
+		stopRecursiveInfiniteLoop = 10;
+		
+		
+		
 		int amount = 0;
+		//new color chosen
 		if (lastAmount == -1) {
-			amount = Math.max(myCompulsiveEater.getAIntInHand()[tradeAway] / 4, 0); //changed - possibly we are done w that color
+			amount = Math.max(myCompulsiveEater.getAIntInHand()[tradeAway] / Parameters.BIG_AMOUNT_DIVISOR, 0); //changed - possibly we are done w that color
 		} else {
-			amount = Math.min(lastAmount*5/4, myCompulsiveEater.getAIntInHand()[tradeAway]);
+			
+			int netChange = prevInventory - myCompulsiveEater.getAIntInHand()[tradeAway];
+		
+			System.out.println("NET CHANGE: " + netChange);
+			
+			if (prevInventory!=-1 && netChange < lastAmount) {
+				System.out.println("RETRY COLOR");
+				System.out.println("TURN COUNTER: " + turnCounter);
+				amount = Math.max(lastAmount / 2, 1);
+			} else {
+				if (netChange==0 && myCompulsiveEater.getPilesBelowSecondaryThreshold().size()!=0) {
+					lastAmount=-1;
+					pileIterator = (pileIterator + 1) % myCompulsiveEater.getPilesBelowSecondaryThreshold().size();
+						if (stopRecursiveInfiniteLoop==0) {
+							int[] offered = new int[intColorNum];
+							int[] desired = new int[intColorNum];
+							
+							for (int i = 0; i < intColorNum; i++) {
+								offered[i]=0;
+								desired[i]=0;
+							}
+							
+							Offer o = new Offer(myCompulsiveEater.getPlayerIndex(), intColorNum);
+							o.setOffer(offered, desired);
+							return o;
+						}
+						
+						stopRecursiveInfiniteLoop--;
+						return getHoardingOffer();
+				}
+				
+				System.out.println("OFFER WENT THROUGH");
+				turnCounter = 0;
+				amount = Math.min(Math.max(lastAmount*3/2, lastAmount+1), myCompulsiveEater.getAIntInHand()[tradeAway]);
+			}
 		}
 		
 		lastAmount = amount;
+		prevInventory = myCompulsiveEater.getAIntInHand()[tradeAway];
 		lastTradeAway = tradeAway;
 		
 		int[] offered = new int[intColorNum];
@@ -212,7 +347,7 @@ public class OfferGeneratorImplementer implements OfferGenerator{
 		int tradeAmount = 0;
 		
 		//This if check may be redundant. Player shouldn't call getSteppingOffer if this is the case.
-		if (myCompulsiveEater.getPreferences()[lastEatIndex] >= Parameters.PRIMARY_THRESHOLD
+		if (myCompulsiveEater.getPreferences()[lastEatIndex] >= Parameters.PRIMARY_THRESHOLD + myCompulsiveEater.mean
 				|| currentTurn >= intColorNum){
 			return getHoardingOffer();
 		}
@@ -221,7 +356,7 @@ public class OfferGeneratorImplementer implements OfferGenerator{
 		
 		if (currentTurn == 0){ //if first turn	
 		//can maybe combine turn 0 with turn 1 to turn intColorNum-1
-			if (myCompulsiveEater.getPreferences()[lastEatIndex] < Parameters.SECONDARY_THRESHOLD){
+			if (myCompulsiveEater.getPreferences()[lastEatIndex] < myCompulsiveEater.mean){
 				Pair<Integer, Integer> nextColor = piles.get(currentTurn + 1);
 				tradeAmount = currentColor.getFront()/Parameters.BIG_AMOUNT_DIVISOR;
 				aintOffer[currentColor.getBack()] = tradeAmount;
@@ -232,7 +367,7 @@ public class OfferGeneratorImplementer implements OfferGenerator{
 			}
 		}
 		else if (currentTurn>=1 && currentTurn<intColorNum-1){
-			if (myCompulsiveEater.getPreferences()[lastEatIndex] < Parameters.SECONDARY_THRESHOLD){
+			if (myCompulsiveEater.getPreferences()[lastEatIndex] < myCompulsiveEater.mean){
 				Pair<Integer, Integer> nextColor = piles.get(currentTurn + 1);
 				//if (pilesBelowSecondaryThreshold.size()>0){
 					tradeAmount = pilesBelowSecondaryThreshold.get(0).getFront()/Parameters.BIG_AMOUNT_DIVISOR;

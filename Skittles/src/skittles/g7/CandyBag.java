@@ -129,8 +129,8 @@ public class CandyBag {
 	 */
 	public Candy getLeastPositive(){
 		Candy[] candies = sortByGain(bag.values()).toArray(new Candy[getNumColors()]);
-		System.out.println("Sorted by order of descending gain:");
-		for(int i=0; i<candies.length; i++)		System.out.println(candies[i]);
+		//System.out.println("Sorted by order of descending gain:");
+		//for(int i=0; i<candies.length; i++)		System.out.println(candies[i]);
 		
 		if(candies.length == 1){
 			if(candies[0].value() > 0) return candies[0];

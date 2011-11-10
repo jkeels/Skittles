@@ -34,6 +34,7 @@ public class Game
 	
 	private int[] totalSkittlesInMarket = null;
 	private int skittlesPerPlayer;
+	private double dblTasteMean;
 	
 	public static Scanner scnInput = new Scanner( System.in );
 	
@@ -101,6 +102,7 @@ public class Game
 				else
 				{
 					double dblMean = Double.parseDouble( astrTastes[ 1 ] );
+					this.dblTasteMean = dblMean;
 					adblTastes = randomTastes( dblMean );
 					boolean nl = false;
 					if (Stats.happinessDistribution)
@@ -167,7 +169,7 @@ public class Game
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-				plyNew.initialize( intPlayerNum, i, strPlayerClass, aintInHand.clone() );
+				plyNew.initialize( intPlayerNum, dblTasteMean, i, strPlayerClass, aintInHand.clone() );
 				alPlayers.add( plyNew );
 				PlayerStatus plsTemp = new PlayerStatus( i, strPlayerClass, aintInHand.clone(), adblTastes.clone() );
 				alPlayerStatus.add( plsTemp );
@@ -205,10 +207,7 @@ public class Game
 		logGame( abfwPortfolio, "N" );
 		while ( !checkFinish() )
 		{
-			if (firstRound)
-			{
-				showEveryInHand();		
-			}
+			showEveryInHand();		
 			everyoneEatAndOffer();
 			logGame( abfwPortfolio, "E" );
 			int[] aintOrder = generateRandomOfferPickOrder();			// need code to log the order for repeated game
@@ -224,7 +223,7 @@ public class Game
 		{
 			for (PlayerStatus plsTemp : aplsPlayerStatus)
 			{
-				if (Stats.playerFilter == -1 || Stats.playerFilter == plsTemp.getPlayerIndex())
+				if (Stats.playerFilter.contains(-1) || Stats.playerFilter.contains(plsTemp.getPlayerIndex()))
 				{
 					String netGive = intArrToString(plsTemp.getCumulativeTradeAway());
 					String netGain = intArrToString(plsTemp.getCumulativeTradeGain());
@@ -243,11 +242,11 @@ public class Game
 		TreeSet<Score> finalScores = new TreeSet<Score>();
 		for ( PlayerStatus plsTemp : aplsPlayerStatus )
 		{
-			double dblTempHappy = plsTemp.getHappiness() + ((dblTotalScores - plsTemp.getHappiness()) / (intPlayerNum - 1));
+			double dblTempHappy = (plsTemp.getHappiness() + ((dblTotalScores - plsTemp.getHappiness()) / (intPlayerNum - 1))) / 2;
 			rawScores.add(new Score(plsTemp.getPlayerIndex(), plsTemp.getHappiness()));
 			finalScores.add(new Score(plsTemp.getPlayerIndex(), dblTempHappy));
 			boolean nl = true;
-			if (Stats.rawScore && (Stats.playerFilter == -1 || Stats.playerFilter == plsTemp.getPlayerIndex()))
+			if (Stats.rawScore && (Stats.playerFilter.contains(-1) || Stats.playerFilter.contains(plsTemp.getPlayerIndex())))
 			{
 				if (nl)
 				{
@@ -256,7 +255,7 @@ public class Game
 				nl = false;
 				System.out.println( "Player #" + plsTemp.getPlayerIndex() + "'s RAW happiness is: " + plsTemp.getHappiness() );
 			}
-			if (Stats.othersAvgScore && (Stats.playerFilter == -1 || Stats.playerFilter == plsTemp.getPlayerIndex()))
+			if (Stats.othersAvgScore && (Stats.playerFilter.contains(-1) || Stats.playerFilter.contains(plsTemp.getPlayerIndex())))
 			{
 				if (nl)
 				{
@@ -265,7 +264,7 @@ public class Game
 				System.out.println( "Average of scores (minus Player#" + plsTemp.getPlayerIndex() + ") is: " + (dblTotalScores - plsTemp.getHappiness()) / (intPlayerNum - 1) );
 				nl = false;
 			}
-			if (Stats.finalScore && (Stats.playerFilter == -1 || Stats.playerFilter == plsTemp.getPlayerIndex()))
+			if (Stats.finalScore && (Stats.playerFilter.contains(-1) || Stats.playerFilter.contains(plsTemp.getPlayerIndex())))
 			{
 				if (nl)
 				{
@@ -500,20 +499,22 @@ public class Game
 /*		System.out.println( "<<<<<<<<<<<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n" );
 		System.out.println( "******************************************" );
 		System.out.println( "------------------------------------------");*/
-		firstRound = false;
 		boolean nl = false;
-		if (Stats.skittlesDistribution)
+		if (Stats.skittlesDistribution || Stats.skittlesPortfolio)
 		{
 			nl = true;
 			System.out.println( "Skittles portfolio:" );
 			for ( PlayerStatus plsTemp : aplsPlayerStatus )
 			{
-				System.out.println( plsTemp.toString() );
+				if (firstRound || Stats.playerFilter.contains(-1) || Stats.playerFilter.contains(plsTemp.getPlayerIndex()))
+				{
+					System.out.println( plsTemp.toString() );
+				}
 			}
 			System.out.println();
 		}
 		
-		if (Stats.noTradePotentialScore)
+		if (Stats.noTradePotentialScore && firstRound)
 		{
 			nl = true;
 			for (PlayerStatus plsTemp : aplsPlayerStatus)
@@ -535,7 +536,7 @@ public class Game
 				System.out.println("Player #" + plsTemp.getPlayerIndex() + "'s potential score without trading is " + potentialScore);
 			}
 		}
-		if (Stats.maxHoardPotentialScore)
+		if (Stats.maxHoardPotentialScore && firstRound)
 		{
 			for (PlayerStatus plsTemp : aplsPlayerStatus)
 			{
@@ -579,7 +580,7 @@ public class Game
 			System.out.println();
 			System.out.println("---------------------------------------------------");
 		}
-		
+		firstRound = false;		
 /*		System.out.println( "------------------------------------------");
 		System.out.println( "******************************************\n" );*/
 	}
@@ -652,7 +653,7 @@ public class Game
 			System.out.println( "Skittles consumption:" );
 			for ( int intPlayerIndex = 0; intPlayerIndex < intPlayerNum; intPlayerIndex ++ )
 			{
-				if (Stats.playerFilter == -1 || Stats.playerFilter == intPlayerIndex)
+				if (Stats.playerFilter.contains(-1) || Stats.playerFilter.contains(intPlayerIndex))
 				{
 					System.out.print( "Player #" + intPlayerIndex + ": [ " );
 					String strInHand = "";
@@ -670,7 +671,7 @@ public class Game
 			System.out.println( "All offers:" );
 			for ( Offer offTemp : aoffCurrentOffers )
 			{
-				if (Stats.playerFilter == -1 || (Stats.playerFilter == offTemp.getOfferedByIndex() || Stats.playerFilter == offTemp.getPickedByIndex()))
+				if (Stats.playerFilter.contains(-1) || (Stats.playerFilter.contains(offTemp.getOfferedByIndex()) || Stats.playerFilter.contains(offTemp.getPickedByIndex())))
 				{
 					System.out.println( offTemp.toString() );
 				}
@@ -765,7 +766,7 @@ public class Game
 					aplsPlayerStatus[offTemp.getPickedByIndex()].updateCumulativeTrades(offTemp);
 					if (Stats.allAcceptedTrades)
 					{
-						if (Stats.playerFilter == -1 || (Stats.playerFilter == offTemp.getOfferedByIndex() || Stats.playerFilter == offTemp.getPickedByIndex()))
+						if (Stats.playerFilter.contains(-1) || (Stats.playerFilter.contains(offTemp.getOfferedByIndex()) || Stats.playerFilter.contains(offTemp.getPickedByIndex())))
 						{
 							System.out.println( offTemp.toString() );
 						}
