@@ -69,16 +69,28 @@ public class TradeHistory {
 	}
 	
 	
-	public int getTradeSize(Player me, int color){
+	public int getTradeSize(Player me, CandyBag bag, int color, Integer partner, int[] colorsToGiveUp){
 		int numExchanged = random.nextInt(OFFER_SIZE)+1;
 		int min=0;
+		int prospectivePartner = -1;
+		//Candy[] sortedCandies = bag.sortByGain().toArray(new Candy[bag.getNumColors()]);
+		
 		for(int player = 0; player < liquidity.length; player++){
 			if(player != me.getPlayerIndex() && liquidity[player][color] > min){
 				min = liquidity[player][color];
+				prospectivePartner = player;
+				for(int c = 0; c < liquidity[player].length; c++){
+					if(c != color && liquidity[player][c] < 0){
+						colorsToGiveUp[c] = -liquidity[player][c];
+					}
+				}
 			}
 		}
 		if(min > 0){
 			numExchanged = min;
+			partner = prospectivePartner;
+		}else{
+			partner = -1;
 		}
 		return numExchanged;
 	}
@@ -91,7 +103,9 @@ public class TradeHistory {
 		int[] ask = new int[numColors];
 		
 		int fav = candies.get(0).getColor();
-		int numExchanged = getTradeSize(me, fav);
+		Integer partner = new Integer(-1);
+		int[] colorsToGiveUp = new int[bag.getNumColors()];
+		int numExchanged = getTradeSize(me, bag, fav, partner, colorsToGiveUp);
 		
 		if(!tradesOfferedByMe.isEmpty()){
 			Offer oldOffer = tradesOfferedByMe.get(tradesOfferedByMe.size()-1);
@@ -99,10 +113,29 @@ public class TradeHistory {
 				numExchanged = oldOffer.getDesire()[fav] - STEP;
 				if(numExchanged <= 0 && candies.size() > 1){
 					fav = candies.get(1).getColor();
-					numExchanged = getTradeSize(me, fav);
+					numExchanged = getTradeSize(me, bag, fav, partner, colorsToGiveUp);
 				}
 			}
 		}
+		
+		int numToGiveUp = 0;
+		for(int i=0; i < numColors; i++){
+			numToGiveUp += colorsToGiveUp[i];
+		}
+		if(numExchanged > numToGiveUp){
+			numExchanged = numToGiveUp;
+		}
+		
+		// Now we need to check if we are giving up something that we hoard
+		Offer tempOffer = new Offer(me.getPlayerIndex(), numColors);
+		int[] tempAsk = new int[numColors];
+		tempAsk[fav] = numExchanged;
+		tempOffer.setOffer(tempAsk, colorsToGiveUp);
+		double gain = Strategy.checkOffer(bag, tempOffer);
+		
+		if(gain > 0){
+			currentOffer.setOffer(colorsToGiveUp, tempAsk);
+		}else{
 			
 		double highestFavColorValue = -1;
 		int highestFavColorIndex = -1;
@@ -132,7 +165,7 @@ public class TradeHistory {
 		}
 
 		currentOffer.setOffer(bid, ask);
-
+		}
 	}
 	
 	
