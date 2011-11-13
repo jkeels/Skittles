@@ -181,9 +181,6 @@ public class TradeHistory {
 			}
 			List<Candy> prefList = bag.sortByPreference();
 			List<Candy> gainList = bag.sortByGain();
-			if(gainList.get(2).getRemaining() == 0){
-				System.out.println();
-			}
 			int index = 1;
 			Candy wantColor = prefList.get(prefList.size() - index);
 			try {
